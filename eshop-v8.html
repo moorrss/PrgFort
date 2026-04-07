@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eShop — Koddokumentation</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0e14;--s1:#111318;--s2:#181c24;--s3:#1e2330;--b1:#252c3d;--b2:#2e3850;
+  --blue:#4d7cfe;--bdim:rgba(77,124,254,.1);--green:#3ecf8e;--gdim:rgba(62,207,142,.1);
+  --ora:#f5a623;--odim:rgba(245,166,35,.1);--red:#f03e3e;--rdim:rgba(240,62,62,.1);
+  --pur:#9775fa;--pudim:rgba(151,117,250,.1);--cya:#22d3ee;--pnk:#f472b6;
+  --tx:#e2e8f4;--txd:#8892a4;--txm:#3d4a5c;
+  --mono:'IBM Plex Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:var(--sans)}
+.app{display:flex;height:100vh;flex-direction:column}
+.topbar{height:54px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;z-index:10}
+.logo{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--blue);white-space:nowrap}
+.logo em{color:var(--txd);font-style:normal}
+.sb{flex:1;max-width:540px;position:relative}
+.sb input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:8px 34px;font-family:var(--mono);font-size:13px;color:var(--tx);outline:none;transition:border-color .2s,box-shadow .2s}
+.sb input::placeholder{color:var(--txm)}
+.sb input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--bdim)}
+.sb .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--txm);pointer-events:none;font-size:13px}
+.sb .clr{position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--txm);cursor:pointer;font-size:18px;display:none}
+.sb .clr.on{display:block}
+.aibtn{display:flex;align-items:center;gap:6px;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.aibtn:hover{opacity:.85}
+.body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:212px;background:var(--s1);border-right:1px solid var(--b1);overflow-y:auto;flex-shrink:0;padding:12px 0 24px}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.sh{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txm);padding:10px 14px 4px;text-transform:uppercase}
+.si{display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:12.5px;cursor:pointer;border-left:2px solid transparent;color:var(--txd);transition:all .15s;user-select:none}
+.si:hover{background:var(--s2);color:var(--tx)}
+.si.act{border-left-color:var(--blue);background:var(--bdim);color:var(--blue)}
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.main{flex:1;overflow-y:auto;padding:22px 26px}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
+.aip{position:fixed;right:0;top:54px;bottom:0;width:400px;background:var(--s1);border-left:1px solid var(--b1);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:20}
+.aip.open{transform:translateX(0)}
+.aiphd{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
+.aiphd .tit{font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px}
+.xbtn{background:none;border:none;color:var(--txd);font-size:20px;cursor:pointer}
+.xbtn:hover{color:var(--tx)}
+.aimsgs{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px}
+.aimsgs::-webkit-scrollbar{width:3px}
+.aimsgs::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.msg{padding:11px 13px;border-radius:10px;font-size:13px;line-height:1.65}
+.msg.user{background:var(--bdim);border:1px solid rgba(77,124,254,.2);color:var(--tx);align-self:flex-end;max-width:88%}
+.msg.bot{background:var(--s2);border:1px solid var(--b1);color:var(--tx)}
+.msg.bot pre{margin:10px 0 0;background:var(--bg);border:1px solid var(--b1);border-radius:7px;padding:12px;font-family:var(--mono);font-size:12px;overflow-x:auto;line-height:1.75;color:var(--tx)}
+.msg.bot code{font-family:var(--mono);font-size:12px;background:var(--s3);padding:1px 5px;border-radius:3px}
+.msg.ld{color:var(--txd);font-style:italic}
+.aiia{padding:12px 18px;border-top:1px solid var(--b1);display:flex;gap:9px}
+.aiia textarea{flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:9px 11px;color:var(--tx);font-family:var(--sans);font-size:13px;resize:none;outline:none;height:68px;transition:border-color .2s}
+.aiia textarea:focus{border-color:var(--blue)}
+.aiia textarea::placeholder{color:var(--txm)}
+.sndbtn{background:var(--blue);border:none;border-radius:8px;padding:0 13px;color:#fff;cursor:pointer;font-size:17px;align-self:flex-end;height:36px}
+.sndbtn:disabled{opacity:.4;cursor:not-allowed}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:10px;margin-bottom:16px;overflow:hidden;animation:fi .22s ease both}
+.chd{padding:13px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.ctit{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.tag{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+.tctrl{background:var(--bdim);color:var(--blue);border:1px solid rgba(77,124,254,.2)}
+.ten{background:var(--gdim);color:var(--green);border:1px solid rgba(62,207,142,.2)}
+.tif{background:var(--pudim);color:var(--pur);border:1px solid rgba(151,117,250,.2)}
+.trp{background:var(--odim);color:var(--ora);border:1px solid rgba(245,166,35,.2)}
+.tsv{background:rgba(34,211,238,.1);color:var(--cya);border:1px solid rgba(34,211,238,.2)}
+.tdt{background:rgba(110,231,183,.1);color:#6ee7b7;border:1px solid rgba(110,231,183,.2)}
+.tdto{background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.2)}
+.tkw{background:rgba(244,114,182,.1);color:var(--pnk);border:1px solid rgba(244,114,182,.2)}
+.tpg{background:rgba(232,121,249,.1);color:#e879f9;border:1px solid rgba(232,121,249,.2)}
+.cbd{padding:15px 18px}
+.desc{font-size:13.5px;color:var(--txd);line-height:1.7;margin-bottom:14px}
+.methods{display:flex;flex-direction:column;gap:7px}
+.method{background:var(--s2);border:1px solid var(--b1);border-radius:8px;overflow:hidden}
+.mhd{padding:9px 13px;display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
+.mhd:hover{background:var(--s3)}
+.verb{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;width:52px;text-align:center}
+.vget{background:rgba(62,207,142,.15);color:var(--green)}
+.vpost{background:var(--bdim);color:var(--blue)}
+.vput{background:var(--odim);color:var(--ora)}
+.vdel{background:var(--rdim);color:var(--red)}
+.vpatch{background:rgba(34,211,238,.12);color:var(--cya)}
+.vno{background:var(--s3);color:var(--txd)}
+.mname{font-family:var(--mono);font-size:13px;flex:1;color:var(--tx)}
+.mroute{font-family:var(--mono);font-size:11px;color:var(--txm)}
+.marr{color:var(--txm);font-size:11px;transition:transform .2s}
+.marr.open{transform:rotate(90deg)}
+.mbd{display:none;padding:13px;border-top:1px solid var(--b1)}
+.mbd.open{display:block}
+.mdesc{font-size:13px;color:var(--txd);line-height:1.65;margin-bottom:11px}
+.codewrap{position:relative}
+.codewrap pre{background:#080a0f;border:1px solid var(--b1);border-radius:8px;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.75;color:#c9d1e0;white-space:pre}
+.cpbtn{position:absolute;top:8px;right:8px;background:var(--s2);border:1px solid var(--b1);border-radius:5px;color:var(--txd);font-family:var(--sans);font-size:11px;padding:3px 9px;cursor:pointer}
+.cpbtn:hover{background:var(--s3);color:var(--tx)}
+.ptit{font-size:21px;font-weight:700;margin-bottom:5px}
+.psub{font-size:13.5px;color:var(--txd);margin-bottom:22px}
+.ogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.scard{background:var(--s1);border:1px solid var(--b1);border-radius:9px;padding:14px}
+.snum{font-size:26px;font-weight:700;font-family:var(--mono);color:var(--blue)}
+.slbl{font-size:11.5px;color:var(--txd);margin-top:3px}
+.tip{background:rgba(77,124,254,.06);border:1px solid rgba(77,124,254,.15);border-radius:8px;padding:11px 14px;font-size:12.5px;color:var(--txd);margin-bottom:16px;line-height:1.6}
+.tip strong{color:var(--blue)}
+.rh{font-size:13px;color:var(--txm);margin-bottom:14px}
+.rh strong{color:var(--tx)}
+.ri{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:13px 15px;margin-bottom:9px;cursor:pointer;transition:border-color .2s;animation:fi .18s ease both}
+.ri:hover{border-color:var(--blue)}
+.ritit{font-family:var(--mono);font-size:13px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.risub{font-size:12.5px;color:var(--txd);line-height:1.5}
+mark{background:rgba(77,124,254,.25);color:#93b4ff;border-radius:2px;padding:0 2px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.fcrd{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:15px;cursor:pointer;transition:border-color .2s,transform .15s;animation:fi .22s ease both}
+.fcrd:hover{border-color:var(--blue);transform:translateY(-2px)}
+.pill{font-family:var(--mono);font-size:10px;padding:2px 7px;background:var(--s2);border:1px solid var(--b1);border-radius:20px;color:var(--txm)}
+.deep-section{margin-bottom:18px}
+.deep-section h3{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:8px}
+.deep-section p{font-size:13.5px;color:var(--txd);line-height:1.75;margin-bottom:8px}
+.deep-section p strong{color:var(--tx);font-weight:600}
+.analogy{background:rgba(77,124,254,.06);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:12px 14px;margin:10px 0;font-size:13px;color:var(--txd);line-height:1.65}
+.analogy em{color:var(--blue);font-style:normal;font-weight:600}
+.why-box{background:rgba(62,207,142,.06);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:12px 14px;margin:10px 0;font-size:13px;color:var(--txd);line-height:1.65}
+.steps-list{display:flex;flex-direction:column;gap:7px;margin:10px 0}
+.step{display:flex;align-items:flex-start;gap:10px}
+.snum2{flex-shrink:0;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-top:1px}
+.step-txt{font-size:13px;color:var(--txd);line-height:1.55;padding-top:4px}
+.step-txt strong{color:var(--tx)}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.compare-box{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px}
+.compare-box h4{font-size:12px;font-weight:600;margin-bottom:7px}
+.compare-box li{font-size:12px;color:var(--txd);padding-left:14px;position:relative;line-height:1.5;list-style:none}
+.compare-box li::before{content:'•';position:absolute;left:0;color:var(--txm)}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.typing::after{content:'▋';animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+  <div class="logo">eShop<em>.docs</em></div>
+  <div class="sb">
+    <span class="ico">&#8981;</span>
+    <input type="text" id="SI" placeholder="Sök: async, dto, interface, repository, jwt, record, linq ..."/>
+    <button class="clr" id="CLR" onclick="clrSearch()">&#215;</button>
+  </div>
+  <button class="aibtn" onclick="toggleAI()">&#10022; Fråga AI</button>
+</div>
+<div class="body">
+<div class="sidebar" id="SIDEBAR"></div>
+<div class="main" id="MAIN"></div>
+<div class="aip" id="AIP">
+  <div class="aiphd">
+    <div class="tit">&#10022; AI-assistent</div>
+    <button class="xbtn" onclick="toggleAI()">&#215;</button>
+  </div>
+  <div class="aimsgs" id="AIMSGS">
+    <div class="msg bot">Hej! Fråga om eShop-projektet eller C#-begrepp.<br><br>
+    <em>Vad är en DTO?</em> · <em>Hur fungerar async?</em> · <em>Vad gör Repository Pattern?</em> · <em>Förklara JWT</em>
+    </div>
+  </div>
+  <div class="aiia">
+    <textarea id="AIINP" placeholder="Skriv din fråga..." onkeydown="aiKey(event)"></textarea>
+    <button class="sndbtn" id="SNDBTN" onclick="sendAI()">&#10148;</button>
+  </div>
+</div>
+</div>
+</div>
+<script>
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+const H = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const esc = s => String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+function mkCode(raw) {
+  const id = 'c' + Math.random().toString(36).slice(2,8);
+  const div = document.createElement('div');
+  div.className = 'codewrap';
+  const pre = document.createElement('pre');
+  pre.id = id;
+  pre.textContent = raw;
+  const btn = document.createElement('button');
+  btn.className = 'cpbtn';
+  btn.textContent = 'Kopiera';
+  btn.onclick = function() {
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = '✓ OK';
+      setTimeout(() => btn.textContent = 'Kopiera', 1800);
+    });
+  };
+  div.appendChild(pre);
+  div.appendChild(btn);
+  const wrap = document.createElement('div');
+  wrap.appendChild(div);
+  return wrap.innerHTML;
+}
+
+function vcls(v) {
+  return {GET:'vget',POST:'vpost',PUT:'vput',DELETE:'vdel',PATCH:'vpatch'}[v] || 'vno';
+}
+
+function renderMethods(methods) {
+  let html = '<div class="methods">';
+  methods.forEach(m => {
+    html += '<div class="method">';
+    html += '<div class="mhd" onclick="toggleM(this)">';
+    html += '<span class="verb ' + vcls(m.verb) + '">' + H(m.verb||'—') + '</span>';
+    html += '<span class="mname">' + H(m.name) + '</span>';
+    html += '<span class="mroute">' + H(m.route||'') + '</span>';
+    html += '<span class="marr">&#9654;</span>';
+    html += '</div>';
+    html += '<div class="mbd">';
+    html += '<div class="mdesc">' + H(m.desc) + '</div>';
+    html += mkCode(m.code);
+    html += '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function toggleM(el) {
+  const b = el.nextElementSibling;
+  const a = el.querySelector('.marr');
+  const o = b.classList.toggle('open');
+  a.classList.toggle('open', o);
+}
+
+// ─── PAGES DATA ───────────────────────────────────────────────────────────────
+const PAGES = {
+  AuthCtrl: {
+    title:'AuthController', file:'Controllers/AuthController.cs',
+    tagCls:'tctrl', tagLbl:'Controller', route:'api/auth',
+    desc:'Hanterar autentisering: registrering, inloggning och rollhantering. Använder ASP.NET Identity via UserManager och RoleManager. Primary Constructor injectar tre tjänster.',
+    methods:[
+      {verb:'POST',route:'api/auth/register',name:'RegisterUser',
+       desc:'Skapar ny användare, skapar rollen "User" om den saknas, och returnerar JWT-token. Returnerar 201.',
+       code:'[AllowAnonymous]\n[HttpPost("register")]\npublic async Task<ActionResult> RegisterUser(PostRegisterUser model)\n{\n    var user = new User {\n        Email = model.Email,\n        UserName = model.Email,\n        PhoneNumber = model.Phone,\n        FirstName = model.FirstName,\n        LastName = model.LastName\n    };\n    var result = await userManager.CreateAsync(user, model.Password);\n    if (!result.Succeeded) return StatusCode(500, result.Errors);\n\n    var role = await roleManager.FindByNameAsync("User");\n    if (role is null)\n        await roleManager.CreateAsync(new IdentityRole { Name = "User" });\n    await userManager.AddToRoleAsync(user, "User");\n\n    var token = await tokenService.CreateToken(user);\n    return StatusCode(201, new { user.Email, token });\n}'},
+      {verb:'POST',route:'api/auth/login',name:'LoginUser',
+       desc:'Loggar in via e-post (som är UserName). Kontrollerar lösenord. Returnerar JWT eller 401.',
+       code:'[AllowAnonymous]\n[HttpPost("login")]\npublic async Task<ActionResult> LoginUser(PostLoginUser model)\n{\n    var user = await userManager.FindByNameAsync(model.Email);\n    if (user is null || !await userManager.CheckPasswordAsync(user, model.Password))\n        return Unauthorized(new { Success = false, message = "Felaktig inloggning..." });\n\n    var token = await tokenService.CreateToken(user);\n    return Ok(new { Success = true, user.Email, token });\n}'},
+      {verb:'POST',route:'api/auth/role?roleName=X',name:'CreateRole',
+       desc:'Skapar ny roll. Kräver Admin-policy. Idempotent.',
+       code:'[Authorize(Policy = "RequireAdminRights")]\n[HttpPost("role")]\npublic async Task<ActionResult> CreateRole([FromQuery] string roleName)\n{\n    var role = await roleManager.FindByNameAsync(roleName);\n    if (role is null) {\n        role = new IdentityRole { Name = roleName };\n        await roleManager.CreateAsync(role);\n    }\n    return StatusCode(201);\n}'}
+    ]
+  },
+  ProdCtrl: {
+    title:'ProductsController', file:'Controllers/ProductsController.cs',
+    tagCls:'tctrl', tagLbl:'Controller', route:'api/products',
+    desc:'Hanterar produkter via IProductRepository. Controllern vet ingenting om EF Core — all databas-logik i ProductRepository.',
+    methods:[
+      {verb:'GET',route:'api/products',name:'ListAllProducts',
+       desc:'Delegerar till repo.ListAllProducts().',
+       code:'[HttpGet()]\npublic async Task<ActionResult> ListAllProducts()\n{\n    var products = await repo.ListAllProducts();\n    return Ok(new { Success = true, StatusCode = 200,\n        Items = products.Count, Data = products });\n}'},
+      {verb:'GET',route:'api/products/{id}',name:'FindProduct',
+       desc:'Hämtar via ID. 404 om exception kastas.',
+       code:'[HttpGet("{id}")]\npublic async Task<ActionResult> FindProduct(int id)\n{\n    try {\n        var product = await repo.FindProduct(id);\n        return Ok(new { Success = true, Data = product });\n    }\n    catch { return NotFound(); }\n}'},
+      {verb:'POST',route:'api/products',name:'AddProduct',
+       desc:'Skapar produkt. CreatedAtAction genererar Location-header.',
+       code:'[HttpPost()]\npublic async Task<ActionResult> AddProduct(PostProductDto product)\n{\n    try {\n        var id = await repo.AddProduct(product);\n        return CreatedAtAction(nameof(FindProduct), new { id }, product);\n    }\n    catch (Exception ex) { return StatusCode(500, ex.Message); }\n}'}
+    ]
+  },
+  CustCtrl: {
+    title:'CustomersController', file:'Controllers/CustomersController.cs',
+    tagCls:'tctrl', tagLbl:'Controller', route:'api/customers',
+    desc:'Full CRUD för kunder. GET (lista + detalj), POST, PUT, DELETE. Returnerar DTOs.',
+    methods:[
+      {verb:'GET',route:'api/customers',name:'ListAllCustomers',
+       desc:'Hämtar alla kunder med collection expression-syntax.',
+       code:'[HttpGet()]\npublic async Task<ActionResult> ListAllCustomers()\n{\n    var items = await context.Customers.ToListAsync();\n    List<GetAllCustomersDto> customers = [.. items.Select(c => new GetAllCustomersDto() {\n        CustomerId = c.CustomerId,\n        FirstName = c.FirstName,\n        LastName = c.LastName\n    })];\n    return Ok(new { Success = true, Items = customers.Count, Data = customers });\n}'},
+      {verb:'POST',route:'api/customers',name:'AddCustomer',
+       desc:'Skapar ny kund.',
+       code:'[HttpPost()]\npublic async Task<ActionResult> AddCustomer(PostCustomerDto model)\n{\n    Customer customer = new() {\n        FirstName = model.FirstName,\n        LastName = model.LastName,\n        Email = model.Email\n    };\n    context.Customers.Add(customer);\n    await context.SaveChangesAsync();\n    return StatusCode(201, customer);\n}'},
+      {verb:'PUT',route:'api/customers/{id}',name:'UpdateCustomer',
+       desc:'Uppdaterar. Change Tracker genererar UPDATE. Returnerar 204.',
+       code:'[HttpPut("{id}")]\npublic async Task<ActionResult> UpdateCustomer(int id, PutCustomerDto model)\n{\n    Customer customer = await context.Customers.FindAsync(id);\n    if (customer is null) return NotFound(new { Message = "Hittade ingen kund" });\n    customer.FirstName = model.FirstName;\n    customer.LastName = model.LastName;\n    customer.Email = model.Email;\n    await context.SaveChangesAsync();\n    return NoContent();\n}'},
+      {verb:'DELETE',route:'api/customers/{id}',name:'DeleteCustomer',
+       desc:'Idempotent — returnerar alltid 204.',
+       code:'[HttpDelete("{id}")]\npublic async Task<ActionResult> DeleteCustomer(int id)\n{\n    Customer customer = await context.Customers.FindAsync(id);\n    if (customer is not null) {\n        context.Customers.Remove(customer);\n        await context.SaveChangesAsync();\n    }\n    return NoContent();\n}'}
+    ]
+  },
+  PayCtrl: {
+    title:'PaymentsController', file:'Controllers/PaymentsController.cs',
+    tagCls:'tctrl', tagLbl:'Controller', route:'api/payments',
+    desc:'Checkout-controller. Konverterar Cart → SalesOrder atomärt i 6 steg.',
+    methods:[
+      {verb:'POST',route:'api/payments?customerId={id}',name:'Pay',
+       desc:'6-stegs checkout: Hämta kund → Vagn → OrderItems → SalesOrder → Radera vagn → Spara atomärt.',
+       code:'[HttpPost()]\npublic async Task<ActionResult> Pay([FromQuery] int customerId)\n{\n    Customer customer = await context.Customers.FindAsync(customerId);\n    if (customer is null) return BadRequest("Kund finns inte!");\n\n    Cart cart = await context.Carts\n        .Include(c => c.CartItems)\n        .SingleOrDefaultAsync(c => c.CustomerId == customerId);\n    if (cart is null) return BadRequest("Ingen kundvagn...");\n\n    List<OrderItem> items = [.. cart.CartItems.Select(o => new OrderItem {\n        ProductId = o.ProductId, Quantity = o.Quantity, Price = o.Price\n    })];\n\n    SalesOrder order = new() { Customer = customer, OrderItems = items };\n    context.SalesOrders.Add(order);\n    context.Carts.Remove(cart);\n    await context.SaveChangesAsync(); // ALLT eller INGET\n    return StatusCode(201);\n}'}
+    ]
+  },
+  CartsCtrl: {
+    title:'CartsController', file:'Controllers/CartsController.cs',
+    tagCls:'tctrl', tagLbl:'Controller', route:'api/carts',
+    desc:'Hanterar kundvagnar. Injectar EShopContext direkt. Skapar ny vagn om kunden saknar en.',
+    methods:[
+      {verb:'POST',route:'api/carts',name:'AddCartItem',
+       desc:'Lägger till produkt. Skapar vagn om den saknas. Uppdaterar quantity om produkten finns.',
+       code:'[HttpPost()]\npublic async Task<ActionResult> AddCartItem(PostCartItemDto model)\n{\n    Customer customer = await context.Customers.FindAsync(model.CustomerId);\n    if (customer is null) return BadRequest("Kunden existerar inte!");\n    Product product = await context.Products.FindAsync(model.ProductId);\n    if (product is null) return BadRequest("Produkten existerar inte!");\n\n    Cart cart = await context.Carts.Include(c => c.CartItems)\n        .SingleOrDefaultAsync(c => c.CustomerId == model.CustomerId);\n\n    if (cart is null) {\n        cart = new Cart { Customer = customer };\n        context.Carts.Add(cart);\n    }\n\n    var found = cart.CartItems?.SingleOrDefault(i => i.ProductId == model.ProductId);\n    if (found is not null)\n        found.Quantity = model.Quantity;\n    else\n        context.CartItems.Add(new CartItem {\n            Cart = cart, Product = product,\n            Quantity = model.Quantity, Price = model.Price\n        });\n\n    await context.SaveChangesAsync();\n    return CreatedAtAction(nameof(FindCart),\n        new { id = cart.CartId }, new { cart.CartId, cart.CreatedDate });\n}'},
+      {verb:'GET',route:'api/carts',name:'ListAllCarts',
+       desc:'Hämtar alla vagnar med kundinfo via LINQ-projektion.',
+       code:'[HttpGet()]\npublic async Task<ActionResult> ListAllCarts()\n{\n    var carts = await context.Carts\n        .Select(c => new {\n            c.CartId, c.CustomerId,\n            c.Customer.FirstName, c.Customer.LastName,\n            c.Customer.Email,\n            CreatedDate = c.CreatedDate.ToShortDateString()\n        }).ToListAsync();\n    return Ok(new { Success = true, Items = carts.Count, Data = carts });\n}'}
+    ]
+  },
+  SuppCtrl: {
+    title:'SuppliersController', file:'Controllers/SuppliersController.cs',
+    tagCls:'tctrl', tagLbl:'Controller', route:'api/suppliers',
+    desc:'Hanterar leverantörer via ISupplierRepository. Repository Pattern. try-catch på alla metoder.',
+    methods:[
+      {verb:'GET',route:'api/suppliers',name:'ListAllSuppliers',
+       desc:'Hämtar alla leverantörer.',
+       code:'[HttpGet()]\npublic async Task<ActionResult> ListAllSuppliers()\n{\n    try {\n        var suppliers = await repo.ListAllSuppliers();\n        return Ok(new { Success = true, Items = suppliers.Count, Data = suppliers });\n    }\n    catch (Exception ex) { return StatusCode(500, ex.Message); }\n}'},
+      {verb:'POST',route:'api/suppliers',name:'AddSupplier',
+       desc:'Skapar leverantör.',
+       code:'[HttpPost()]\npublic async Task<ActionResult> AddSupplier(PostSupplierDto supplier)\n{\n    try {\n        var id = await repo.AddSupplier(supplier);\n        if (id > 0)\n            return CreatedAtAction(nameof(FindSupplier), new { id }, supplier);\n        return BadRequest("Något gick fel!");\n    }\n    catch { return StatusCode(500, "Fel vid sparning"); }\n}'}
+    ]
+  },
+  ProdRepo: {
+    title:'ProductRepository', file:'Repositories/ProductRepository.cs',
+    tagCls:'trp', tagLbl:'Repository',
+    desc:'Implementerar IProductRepository. All EF Core + LINQ för produkter. Projektion med .Select() — SQL hämtar bara fält vi behöver.',
+    methods:[
+      {verb:'—',route:'AddProduct',name:'AddProduct',
+       desc:'Hittar Supplier case-insensitivt, skapar Product, sparar, returnerar ID.',
+       code:'public async Task<int> AddProduct(PostProductDto product)\n{\n    Supplier supplier = await context.Suppliers.FirstOrDefaultAsync(\n        s => s.SupplierName.ToLower().Trim() == product.SupplierName.ToLower().Trim())\n        ?? throw new Exception("Kunde inte hitta leverantören!");\n\n    Product item = new() {\n        ItemNumber = product.ItemNumber,\n        ProductName = product.Name,\n        Price = product.Price,\n        ImageUrl = product.ImageUrl,\n        Description = product.Description,\n        Supplier = supplier\n    };\n    context.Products.Add(item);\n    await context.SaveChangesAsync();\n    return item.Id;\n}'},
+      {verb:'—',route:'FindProduct',name:'FindProduct',
+       desc:'.Where().Select().SingleOrDefaultAsync() — effektivare än FindAsync + manuell mappning.',
+       code:'public async Task<GetProductDto> FindProduct(int id)\n{\n    return await context.Products\n        .Where(p => p.Id == id)\n        .Select(p => new GetProductDto {\n            Id = p.Id, Name = p.ProductName,\n            ItemNumber = p.ItemNumber, Price = p.Price,\n            ImageUrl = p.ImageUrl, Description = p.Description\n        }).SingleOrDefaultAsync()\n        ?? throw new Exception("Hittade ingen produkt!");\n}'},
+      {verb:'—',route:'ListAllProducts',name:'ListAllProducts',
+       desc:'Projektion för lista — utan ImageUrl/Description.',
+       code:'public async Task<List<GetProductsDto>> ListAllProducts()\n{\n    return await context.Products\n        .Select(p => new GetProductsDto {\n            Id = p.Id, ItemNumber = p.ItemNumber,\n            Name = p.ProductName, Price = p.Price\n        }).ToListAsync();\n}'}
+    ]
+  },
+  SuppRepo: {
+    title:'SupplierRepository', file:'Repositories/SupplierRepository.cs',
+    tagCls:'trp', tagLbl:'Repository',
+    desc:'Implementerar ISupplierRepository. FindAsync + manuell mappning. ListAllSuppliers med foreach.',
+    methods:[
+      {verb:'—',route:'FindSupplier',name:'FindSupplier',
+       desc:'FindAsync + null-coalescing throw + manuell DTO-mappning.',
+       code:'public async Task<GetSupplierDto> FindSupplier(int id)\n{\n    Supplier supplier = await context.Suppliers.FindAsync(id)\n        ?? throw new Exception("Kunde inte hitta leverantör");\n    return new GetSupplierDto() {\n        Id = supplier.SupplierId, Name = supplier.SupplierName,\n        Email = supplier.Email, Phone = supplier.Phone,\n        Address = supplier.Address, PostalCode = supplier.PostalCode, City = supplier.City\n    };\n}'},
+      {verb:'—',route:'ListAllSuppliers',name:'ListAllSuppliers',
+       desc:'ToListAsync + foreach för DTO-lista.',
+       code:'public async Task<List<GetSuppliersDto>> ListAllSuppliers()\n{\n    List<Supplier> result = await context.Suppliers.ToListAsync();\n    List<GetSuppliersDto> suppliers = [];\n    foreach (var supplier in result) {\n        suppliers.Add(new GetSuppliersDto {\n            Id = supplier.SupplierId, Name = supplier.SupplierName,\n            Email = supplier.Email, Phone = supplier.Phone\n        });\n    }\n    return suppliers;\n}'}
+    ]
+  },
+  Ifaces: {
+    title:'Interfaces', file:'Interfaces/',
+    tagCls:'tif', tagLbl:'Interface',
+    desc:'Kontrakt för Repository Pattern. Controllers beror på dessa — aldrig på konkreta klasser.',
+    methods:[
+      {verb:'—',route:'IProductRepository',name:'IProductRepository',
+       desc:'Kontraktet för produkthantering. FindProduct overloadad.',
+       code:'public interface IProductRepository\n{\n    Task<List<GetProductsDto>> ListAllProducts();\n    Task<GetProductDto> FindProduct(int id);\n    Task<GetProductDto> FindProduct(string itemNumber);\n    Task<int> AddProduct(PostProductDto product);\n}'},
+      {verb:'—',route:'ISupplierRepository',name:'ISupplierRepository',
+       desc:'Kontraktet för leverantörshantering.',
+       code:'public interface ISupplierRepository\n{\n    Task<List<GetSuppliersDto>> ListAllSuppliers();\n    Task<GetSupplierDto> FindSupplier(int id);\n    Task<int> AddSupplier(PostSupplierDto supplier);\n}\n\n// Program.cs:\nbuilder.Services.AddScoped<ISupplierRepository, SupplierRepository>();'}
+    ]
+  },
+  Entities: {
+    title:'Entities', file:'Entities/',
+    tagCls:'ten', tagLbl:'Entity',
+    desc:'Databasmodeller via EF Core Code-First. record = immutable. class = mutable. Navigeringsegenskaper för JOINs med .Include().',
+    methods:[
+      {verb:'—',route:'Customer.cs',name:'Customer',desc:'Record. [NotNull]-märkta fält.',
+       code:'public record Customer\n{\n    public int CustomerId { get; set; }\n    [NotNull] public string FirstName { get; set; }\n    [NotNull] public string LastName { get; set; }\n    [NotNull] public string Email { get; set; }\n}'},
+      {verb:'—',route:'Cart.cs',name:'Cart',desc:'Class. [ForeignKey]. Navigeringsegenskaper.',
+       code:'public class Cart\n{\n    public int CartId { get; set; }\n    public int CustomerId { get; set; }\n    public DateTime CreatedDate { get; set; } = DateTime.Now;\n    [ForeignKey("CustomerId")]\n    public Customer Customer { get; set; }\n    public List<CartItem> CartItems { get; set; }\n}'},
+      {verb:'—',route:'Product.cs',name:'Product',desc:'Record. [ForeignKey] till Supplier.',
+       code:'public record Product\n{\n    public int Id { get; set; }\n    public int SupplierId { get; set; }\n    [NotNull] public string ItemNumber { get; set; }\n    [NotNull] public string ProductName { get; set; }\n    [NotNull] public decimal Price { get; set; }\n    public string ImageUrl { get; set; }\n    public string Description { get; set; }\n    [ForeignKey("SupplierId")]\n    public Supplier Supplier { get; set; }\n}'},
+      {verb:'—',route:'User.cs',name:'User',desc:'Ärver IdentityUser. Lägger till FirstName och LastName.',
+       code:'public class User : IdentityUser\n{\n    // IdentityUser ger: Id, UserName, Email, PasswordHash...\n    public string FirstName { get; set; }\n    public string LastName { get; set; }\n}'}
+    ]
+  },
+  DTOs: {
+    title:'DTOs', file:'DTOs/',
+    tagCls:'tdto', tagLbl:'DTO',
+    desc:'Data Transfer Objects. Arv-hierarki: Base → Get/Post/Put. Skyddar mot circular reference och data-läckage.',
+    methods:[
+      {verb:'—',route:'DTOs/Customers/',name:'Customer DTOs',desc:'BaseCustomerDto → GetAllCustomersDto / PostCustomerDto / PutCustomerDto.',
+       code:'public abstract class BaseCustomerDto {\n    [Required] public string FirstName { get; set; }\n    [Required] public string LastName { get; set; }\n}\npublic class GetAllCustomersDto : BaseCustomerDto { public int CustomerId { get; set; } }\npublic class PostCustomerDto : BaseCustomerDto { [Required] public string Email { get; set; } }\npublic class PutCustomerDto : PostCustomerDto { } // Tom — ärver allt'},
+      {verb:'—',route:'DTOs/Products/',name:'Product DTOs',desc:'Base → GetProductsDto (lista) → GetProductDto (detalj). PostProductDto med SupplierName.',
+       code:'public class BaseProductDto { public string ItemNumber; public string Name; public decimal Price; }\npublic class GetProductsDto : BaseProductDto { public int Id { get; set; } }\npublic class GetProductDto : GetProductsDto {\n    public string ImageUrl { get; set; }\n    public string Description { get; set; }\n}\npublic record PostProductDto {\n    public string SupplierName { get; set; } // Namn, inte ID!\n    public string ItemNumber { get; set; }\n    public string Name { get; set; }\n    public decimal Price { get; set; }\n}'}
+    ]
+  },
+  TokenSvc: {
+    title:'TokenService', file:'Services/TokenService.cs',
+    tagCls:'tsv', tagLbl:'Service',
+    desc:'Skapar JWT-tokens med claims och HMAC-SHA512-signering. Nyckel från appsettings.json. 5 dagars giltighet.',
+    methods:[
+      {verb:'—',route:'CreateToken',name:'CreateToken',desc:'Claims → roller → nyckel → credentials → JwtSecurityToken → WriteToken.',
+       code:'public async Task<string> CreateToken(User user)\n{\n    List<Claim> claims = [\n        new(ClaimTypes.Email, user.Email),\n        new(ClaimTypes.Name, user.UserName),\n        new("FirstName", user.FirstName),\n        new("Id", user.Id)\n    ];\n    var roles = await userManager.GetRolesAsync(user);\n    foreach (var role in roles)\n        claims.Add(new(ClaimTypes.Role, role));\n\n    var key = new SymmetricSecurityKey(\n        Encoding.UTF8.GetBytes(config["tokenSettings:tokenKey"]));\n    var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);\n\n    var token = new JwtSecurityToken(\n        claims: claims,\n        expires: DateTime.Now.AddDays(5),\n        signingCredentials: credentials);\n    return new JwtSecurityTokenHandler().WriteToken(token);\n}'}
+    ]
+  },
+  DbCtx: {
+    title:'EShopContext', file:'Data/eShopContext.cs',
+    tagCls:'tdt', tagLbl:'DbContext',
+    desc:'Ärver IdentityDbContext<User>. Konfigurerar sammansatta PKs för CartItem och OrderItem.',
+    methods:[
+      {verb:'—',route:'OnModelCreating',name:'DbSets + Composite Keys',desc:'DbSets = tabeller. Sammansatta PKs via Fluent API.',
+       code:'public class EShopContext(DbContextOptions options) : IdentityDbContext<User>(options)\n{\n    public DbSet<Product> Products { get; set; }\n    public DbSet<Supplier> Suppliers { get; set; }\n    public DbSet<Customer> Customers { get; set; }\n    public DbSet<Cart> Carts { get; set; }\n    public DbSet<CartItem> CartItems { get; set; }\n    public DbSet<SalesOrder> SalesOrders { get; set; }\n    public DbSet<OrderItem> OrderItems { get; set; }\n\n    protected override void OnModelCreating(ModelBuilder modelBuilder)\n    {\n        modelBuilder.Entity<CartItem>()\n            .HasKey(c => new { c.CartId, c.ProductId });\n        modelBuilder.Entity<OrderItem>()\n            .HasKey(c => new { c.ProductId, c.SalesOrderId });\n        base.OnModelCreating(modelBuilder);\n    }\n}'}
+    ]
+  },
+  Seed: {
+    title:'SeedDatabase', file:'Data/SeedDatabase.cs',
+    tagCls:'tdt', tagLbl:'Seed',
+    desc:'Fyller databasen vid start. Migrate(), Admin-roll/user, JSON-seed. Idempotent.',
+    methods:[
+      {verb:'—',route:'InitDb',name:'InitDb + SeedSuppliers',desc:'Kör migrations och seedar JSON-data.',
+       code:'public async Task InitDb(WebApplication app)\n{\n    using var scope = app.Services.CreateScope();\n    var context = scope.ServiceProvider.GetRequiredService<EShopContext>();\n    context.Database.Migrate();\n    await SeedUsers();\n    await SeedSuppliers(context);\n    await SeedProducts(context);\n}\n\npublic async Task SeedSuppliers(EShopContext context)\n{\n    if (context.Suppliers.Any()) return; // Idempotent!\n    var json = File.ReadAllText("Data/Json/suppliers.json");\n    var suppliers = JsonSerializer.Deserialize<List<Supplier>>(json, options);\n    if (suppliers is not null && suppliers.Count > 0) {\n        await context.Suppliers.AddRangeAsync(suppliers);\n        await context.SaveChangesAsync();\n    }\n}'}
+    ]
+  },
+  ProgCs: {
+    title:'Program.cs', file:'Program.cs',
+    tagCls:'tpg', tagLbl:'Entry Point',
+    desc:'Appens startpunkt. DI-container, JWT Bearer, Authorization policies, middleware-pipeline.',
+    methods:[
+      {verb:'—',route:'DI',name:'Services och DI',desc:'DbContext, Identity, TokenService och Repositories med AddScoped.',
+       code:'builder.Services.AddDbContext<EShopContext>(o =>\n    o.UseSqlite(builder.Configuration.GetConnectionString("sqlite")));\n\nbuilder.Services.AddIdentityCore<User>(options => {\n    options.User.RequireUniqueEmail = true;\n    options.Password.RequiredLength = 8;\n}).AddRoles<IdentityRole>().AddEntityFrameworkStores<EShopContext>();\n\nbuilder.Services.AddScoped<TokenService>();\nbuilder.Services.AddScoped<ISupplierRepository, SupplierRepository>();\nbuilder.Services.AddScoped<IProductRepository, ProductRepository>();'},
+      {verb:'—',route:'JWT + Policies',name:'Auth och Policies',desc:'JWT Bearer-validering och namngivna policies.',
+       code:'builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)\n    .AddJwtBearer(options => {\n        options.TokenValidationParameters = new TokenValidationParameters {\n            ValidateIssuer = false, ValidateAudience = false,\n            ValidateLifetime = true, ValidateIssuerSigningKey = true,\n            IssuerSigningKey = new SymmetricSecurityKey(\n                Encoding.UTF8.GetBytes(config["tokenSettings:tokenKey"]))\n        };\n    });\n\nbuilder.Services.AddAuthorizationBuilder()\n    .AddPolicy("RequireAdminRights", p => p.RequireRole("Admin"));\n\napp.UseAuthentication(); // Vem är du?\napp.UseAuthorization();  // Vad får du?\napp.MapControllers();'}
+    ]
+  }
+};
+
+// ─── CONCEPTS DATA ────────────────────────────────────────────────────────────
+const CONCEPTS = [
+  {id:'async',title:'async / await',tags:['async','await','asynkron','task'],category:'C# Nyckelord',
+   desc:'async markerar en metod som asynkron. await pausar metoden tills operationen är klar, men frigör tråden. Alla async-metoder returnerar Task eller Task<T>.',
+   projectRef:'Alla Controllers och Repositories',
+   code:'// Synkront — blockerar tråden\npublic ActionResult GetProduct(int id) {\n    var p = context.Products.Find(id); // Blockerar!\n    return Ok(p);\n}\n\n// Asynkront — frigör tråden\npublic async Task<ActionResult> GetProduct(int id) {\n    var p = await context.Products.FindAsync(id); // Frigör!\n    return Ok(p);\n}\n\n// Alla EF Core-metoder har Async-version:\nawait context.Products.ToListAsync()\nawait context.Products.FindAsync(id)\nawait context.SaveChangesAsync()',
+   steps:['async markerar metoden som asynkron','await pausar och frigör tråden','Tråden tar andra requests medan DB svarar','Task<T> = löfte om ett värde']
+  },
+  {id:'interface',title:'interface',tags:['interface','gränssnitt','kontrakt','iproductrepository'],category:'C# Nyckelord',
+   desc:'Ett interface definierar ett kontrakt — vad en klass måste kunna göra, utan att säga hur. Controllers beror på interfaces, aldrig på konkreta klasser. Möjliggör testning med Mock och utbyte av implementation.',
+   projectRef:'Interfaces/IProductRepository.cs, Interfaces/ISupplierRepository.cs',
+   code:'// Kontraktet (VAD)\npublic interface IProductRepository\n{\n    Task<List<GetProductsDto>> ListAllProducts();\n    Task<GetProductDto> FindProduct(int id);\n    Task<int> AddProduct(PostProductDto product);\n}\n\n// Implementationen (HUR)\npublic class ProductRepository : IProductRepository\n{\n    public async Task<List<GetProductsDto>> ListAllProducts()\n        => await context.Products.Select(...).ToListAsync();\n}\n\n// Controller vet INTE vilken implementation som används\npublic class ProductsController(IProductRepository repo) : ControllerBase {}\n\n// Program.cs — byt en rad för att växla\nbuilder.Services.AddScoped<IProductRepository, ProductRepository>();\n// builder.Services.AddScoped<IProductRepository, MockProduct>(); // Test!',
+   steps:['Interface = kontrakt (VAD)','Klass implementerar interface (HUR)','Controller beror på interface — vet ej om DB','Program.cs kopplar Interface → Implementation']
+  },
+  {id:'repository',title:'Repository Pattern',tags:['repository','pattern','repo','designmönster'],category:'Designmönster',
+   desc:'Repository Pattern isolerar all databas-logik i en separat klass. Controllers pratar med ett Interface — aldrig EF Core direkt. Gör koden testbar, utbytbar och lättare att förstå.',
+   projectRef:'Repositories/ProductRepository.cs, Repositories/SupplierRepository.cs',
+   code:'// UTAN Repository (sämre)\npublic class ProductsController(EShopContext context) : ControllerBase\n{\n    [HttpGet]\n    public async Task<ActionResult> List()\n        => Ok(await context.Products.ToListAsync()); // EF direkt!\n}\n\n// MED Repository (bättre)\npublic class ProductsController(IProductRepository repo) : ControllerBase\n{\n    [HttpGet]\n    public async Task<ActionResult> ListAllProducts()\n    {\n        var products = await repo.ListAllProducts(); // Abstraherat!\n        return Ok(new { Success = true, Data = products });\n    }\n}',
+   steps:['HTTP Request når Controller','Controller anropar Interface (IProductRepository)','Repository hanterar EF Core + SQL','Repository returnerar DTO']
+  },
+  {id:'dto',title:'DTO — Data Transfer Object',tags:['dto','data transfer object','getproductdto','postproductdto'],category:'Designmönster',
+   desc:'DTO definierar exakt vilken data som skickas in och ut via API:et. Separerar API-kontraktet från databasens struktur. Förhindrar circular references och data-läckage.',
+   projectRef:'DTOs/Products/, DTOs/Customers/, DTOs/Suppliers/',
+   code:'// Entity — intern (aldrig exponeras direkt)\npublic record Product {\n    public int Id { get; set; }\n    public int SupplierId { get; set; }    // FK — ska ej synas\n    public string ProductName { get; set; }\n    public Supplier Supplier { get; set; } // Circular reference!\n}\n\n// DTO-hierarki via arv\npublic class BaseProductDto { public string Name; public decimal Price; }\npublic class GetProductsDto : BaseProductDto { public int Id; } // Lista\npublic class GetProductDto : GetProductsDto {  // Detalj\n    public string ImageUrl { get; set; }\n    public string Description { get; set; }\n}\n\n// Mappning i Repository:\n.Select(p => new GetProductDto {\n    Name = p.ProductName, // Namnbyte!\n    Price = p.Price,\n    ImageUrl = p.ImageUrl\n})',
+   steps:['Entity = intern databasmodell','DTO = externt API-kontrakt','Arv: Base → GetDto → PostDto','Projektion: Entity → DTO i Repository']
+  },
+  {id:'di',title:'Dependency Injection (DI)',tags:['dependency injection','di','ioc','scoped','addscoped'],category:'ASP.NET Core',
+   desc:'DI är ett mönster där ett objekt inte skapar sina egna beroenden — de ges utifrån. ASP.NET Core registrerar tjänster i Program.cs och skapar dem automatiskt. Scoped = ny instans per HTTP-request.',
+   projectRef:'Program.cs',
+   code:'// Registrering i Program.cs\nbuilder.Services.AddScoped<TokenService>();\nbuilder.Services.AddScoped<IProductRepository, ProductRepository>();\n\n// ASP.NET Core skapar och injectar automatiskt\npublic class ProductsController(IProductRepository repo) : ControllerBase\n{\n    // ASP.NET skapade ProductRepository och gav det hit!\n}\n\n// Tre livslängder:\n// AddSingleton  — EN instans hela appens livstid\n// AddScoped     — NY instans per HTTP-request\n// AddTransient  — NY instans varje gång den begärs',
+   steps:['Registrera tjänst i Program.cs','ASP.NET Core skapar instansen','Injiceras via Primary Constructor','Scoped = ny instans per HTTP-request']
+  },
+  {id:'efcore',title:'Entity Framework Core',tags:['entity framework','ef core','orm','dbcontext','dbset','savechanges','migration','code first'],category:'EF Core',
+   desc:'EF Core är ett ORM som oversätter C#-kod till SQL. Code-First: du skriver klasser, EF skapar tabellerna. LINQ-queries översätts automatiskt till SQL.',
+   projectRef:'Data/eShopContext.cs, alla Repositories',
+   code:'// Code-First: klass → tabell\npublic record Product { public int Id; public string ProductName; }\n// dotnet ef migrations add Init\n// dotnet ef database update\n// → CREATE TABLE Products (Id INTEGER PK, ProductName TEXT)\n\n// LINQ → SQL (automatiskt)\ncontext.Products.FindAsync(5);\n// → SELECT * FROM Products WHERE Id = 5\n\ncontext.Products.ToListAsync();\n// → SELECT * FROM Products\n\ncontext.Products.Where(p => p.Id == id).Select(p => new GetProductDto {...});\n// → SELECT Id, ProductName, Price FROM Products WHERE Id = @id\n\nproduct.Price = 99; await context.SaveChangesAsync();\n// → UPDATE Products SET Price = 99 WHERE Id = @id',
+   steps:['Skriv C#-klass (Entity)','dotnet ef migrations add','dotnet ef database update','LINQ-queries → SQL automatiskt']
+  },
+  {id:'jwt',title:'JWT — JSON Web Token',tags:['jwt','token','bearer','claims','hmac','sha512'],category:'Säkerhet',
+   desc:'JWT är ett signerat datapaket som bevisar vem du är. Tre delar: Header (algoritm), Payload (claims/data), Signature (verifiering). Kan läsas av alla, men kan inte förfalskas utan nyckeln.',
+   projectRef:'Services/TokenService.cs, Controllers/AuthController.cs',
+   code:'// JWT = header.payload.signature\n// Payload (claims) — LÄSBAR men ej förfalskbar\nList<Claim> claims = [\n    new(ClaimTypes.Email, user.Email),\n    new(ClaimTypes.Name, user.UserName),\n    new("Id", user.Id)\n];\n\n// Signatur med hemlig nyckel från appsettings.json\nvar key = new SymmetricSecurityKey(\n    Encoding.UTF8.GetBytes(config["tokenSettings:tokenKey"]));\nvar creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);\n\nvar token = new JwtSecurityToken(\n    claims: claims,\n    expires: DateTime.Now.AddDays(5),\n    signingCredentials: creds);\n\nreturn new JwtSecurityTokenHandler().WriteToken(token);\n// → eyJhbGci... (en lång sträng)',
+   steps:['Skapa claims (email, namn, roller)','Hämta hemlig nyckel från appsettings.json','Signera med HMAC-SHA512','Returnera token som string']
+  },
+  {id:'record',title:'record',tags:['record','immutable','oföränderlig','value type'],category:'C# Nyckelord',
+   desc:'record är en C#-typ skapad för data-representationer. Den är immutable by default och jämförs baserat på värden (inte referens). I eShop används record för Entities.',
+   projectRef:'Entities/Customer.cs, Product.cs, Supplier.cs',
+   code:'// record — value-based equality\npublic record Customer { public int Id; public string Name; }\n\nvar c1 = new Customer { Id = 1, Name = "Anna" };\nvar c2 = new Customer { Id = 1, Name = "Anna" };\nbool eq = c1 == c2; // TRUE — jämför värden!\n\n// class — reference-based equality\npublic class Cart { public int Id; }\n\nvar cart1 = new Cart { Id = 1 };\nvar cart2 = new Cart { Id = 1 };\nbool eq2 = cart1 == cart2; // FALSE — olika objekt!',
+   steps:['record = immutable by default','== jämför VÄRDEN (inte referens)','Bra för Entities som representerar data','class används när mutabilitet behövs (Cart, User)']
+  },
+  {id:'linq',title:'LINQ',tags:['linq','select','where','tolist','include','firstordefault','singleordefault','any'],category:'C# / EF Core',
+   desc:'LINQ (Language Integrated Query) låter dig filtrera och transformera samlingar med C#-syntax. Med EF Core översätts LINQ automatiskt till SQL.',
+   projectRef:'ProductRepository.cs, SupplierRepository.cs, CartsController.cs',
+   code:'// .Select() — projektion (välj fält)\ncontext.Products.Select(p => new GetProductsDto {\n    Name = p.ProductName, Price = p.Price\n}).ToListAsync();\n\n// .Where() — filtrering\ncontext.Products.Where(p => p.Id == id)\n    .Select(p => new GetProductDto {...})\n    .SingleOrDefaultAsync();\n\n// .Include() — ladda relaterade objekt (JOIN)\ncontext.Carts\n    .Include(c => c.Customer)\n    .Include(c => c.CartItems)\n    .SingleOrDefaultAsync(c => c.CartId == id);\n\n// .Any() — finns poster?\nif (context.Suppliers.Any()) return; // Hoppa över seed\n\n// Collection expression + .Select()\nList<OrderItem> items = [.. cart.CartItems.Select(o => new OrderItem {\n    ProductId = o.ProductId, Quantity = o.Quantity\n})];',
+   steps:['.Select() = projektion (välj fält → smalare SQL)','.Where() = filtrera rader','.Include() = ladda relaterade objekt (JOIN)','.ToListAsync() = kör SQL och returnera lista']
+  },
+  {id:'savechanges',title:'SaveChangesAsync & Change Tracker',tags:['savechanges','savechangesasync','change tracker','transaktion'],category:'EF Core',
+   desc:'SaveChangesAsync() skriver alla väntande ändringar till databasen i en enda transaktion. EF Core Change Tracker spårar automatiskt Add/Remove/Update.',
+   projectRef:'Controllers/PaymentsController.cs, alla Repositories',
+   code:'// Change Tracker spårar automatiskt\nCustomer customer = await context.Customers.FindAsync(id);\ncustomer.FirstName = "Anna"; // EF Core ser detta!\nawait context.SaveChangesAsync();\n// → UPDATE Customers SET FirstName="Anna" WHERE Id=@id\n\n// ATOMÄRT — allt eller inget (PaymentsController)\ncontext.SalesOrders.Add(order);  // INSERT\ncontext.Carts.Remove(cart);       // DELETE\nawait context.SaveChangesAsync(); // ALLT i en transaktion\n// BEGIN TRANSACTION\n//   INSERT INTO SalesOrders ...\n//   DELETE FROM Carts ...\n// COMMIT',
+   steps:['Add → markerar för INSERT','Remove → markerar för DELETE','Ändra property → markeras automatiskt för UPDATE','SaveChangesAsync → skickar ALLT atomärt']
+  },
+  {id:'navigationprop',title:'Navigeringsegenskaper',tags:['navigation property','navigeringsegenskap','include','join','foreignkey'],category:'EF Core',
+   desc:'Navigeringsegenskaper är properties som refererar till relaterade Entities. EF Core genererar JOINs. Måste laddas explicit med .Include() — annars är de null.',
+   projectRef:'Entities/Cart.cs, CartsController.cs',
+   code:'// Cart har navigeringsegenskaper\npublic class Cart\n{\n    public int CartId { get; set; }\n    public int CustomerId { get; set; }      // FK\n    [ForeignKey("CustomerId")]\n    public Customer Customer { get; set; }   // Nav. prop\n    public List<CartItem> CartItems { get; set; } // Nav. prop\n}\n\n// UTAN .Include() → null!\nCart cart = await context.Carts.FindAsync(id);\n// cart.Customer == null  ← KRASCHAR!\n\n// MED .Include() → JOINs körs\nCart cart = await context.Carts\n    .Include(c => c.Customer)   // LEFT JOIN Customers\n    .Include(c => c.CartItems)  // LEFT JOIN CartItems\n    .SingleOrDefaultAsync(c => c.CartId == id);\n// Nu fungerar: cart.Customer.FirstName',
+   steps:['Entity har property av annan Entity-typ','[ForeignKey] pekar ut FK-kolumnen','.Include() laddar navigeringsegenskapen (JOIN)','Utan .Include() → alltid null']
+  },
+  {id:'compositepk',title:'Sammansatt Primärnyckel',tags:['composite key','sammansatt','primärnyckel','haskey','modelbuilder'],category:'EF Core',
+   desc:'En sammansatt PK består av flera kolumner. CartItem och OrderItem har sammansatta PKs. Konfigureras i EShopContext.OnModelCreating med Fluent API.',
+   projectRef:'Data/eShopContext.cs, Entities/CartItem.cs',
+   code:'// CartItem har ingen egen Id — PK = CartId + ProductId\npublic class CartItem\n{\n    public int CartId { get; set; }    // Del av PK\n    public int ProductId { get; set; } // Del av PK\n    public int Quantity { get; set; }\n    public decimal Price { get; set; }\n}\n\n// Konfigurera i OnModelCreating\nprotected override void OnModelCreating(ModelBuilder modelBuilder)\n{\n    modelBuilder.Entity<CartItem>()\n        .HasKey(c => new { c.CartId, c.ProductId });\n    modelBuilder.Entity<OrderItem>()\n        .HasKey(c => new { c.ProductId, c.SalesOrderId });\n    base.OnModelCreating(modelBuilder);\n}',
+   steps:['CartItem saknar egen Id-kolumn','PK = kombinationen CartId + ProductId','Konfigureras i OnModelCreating','Fluent API: .HasKey(c => new { c.CartId, c.ProductId })']
+  },
+  {id:'genericrepo',title:'Generic Repository (Lektion 13)',tags:['generic repository','igenericrepository','genericrepository','baseeentity','generics','automapper'],category:'Designmönster',
+   desc:'Generic Repository generaliserar Repository Pattern — en enda implementation hanterar alla entity-typer via generics. AutoMapper sköter mappningen Entity → DTO automatiskt.',
+   projectRef:'Interfaces/IGenericRepository.cs, Repositories/GenericRepository.cs, Helpers/MappingProfiles.cs',
+   code:'// IGenericRepository<T> — ett interface för ALLA entities\npublic interface IGenericRepository<T> where T : BaseEntity\n{\n    Task<IReadOnlyList<T>> ListAllAsync();\n    Task<T> FindByIdAsync(int id);\n    void Add(T entity);\n    void Update(T entity);\n    void Delete(T entity);\n    Task<T> FindAsync(Expression<Func<T, bool>> predicate);\n    Task<bool> SaveAllAsync();\n}\n\n// GenericRepository<T> — EN klass för ALLA entities\npublic class GenericRepository<T>(EShopContext context) : IGenericRepository<T>\n    where T : BaseEntity\n{\n    public async Task<IReadOnlyList<T>> ListAllAsync()\n        => await context.Set<T>().ToListAsync();\n\n    public async Task<T> FindByIdAsync(int id)\n        => await context.Set<T>().FindAsync(id);\n\n    public void Add(T entity) => context.Set<T>().Add(entity);\n    public async Task<bool> SaveAllAsync()\n        => await context.SaveChangesAsync() > 0;\n}\n\n// AutoMapper — automatisk Entity -> DTO-mappning\npublic class MappingProfiles : Profile\n{\n    public MappingProfiles()\n    {\n        CreateMap<PostProductDto, Product>()\n            .ForMember(d => d.ProductName, m => m.MapFrom(s => s.Name));\n        CreateMap<Product, GetProductsDto>()\n            .ForMember(d => d.Name, m => m.MapFrom(s => s.ProductName));\n    }\n}',
+   steps:['BaseEntity = basklass alla Entities ärver','IGenericRepository<T> = ett interface för alla','GenericRepository<T> = en klass för alla','AutoMapper mappar Entity → DTO automatiskt']
+  }
+];
+
+// ─── LESSONS DATA ─────────────────────────────────────────────────────────────
+const LESSONS = [
+  {num:1,title:"Intro till ASP.NET Core & REST API",folder:"Lektion-01",
+   topics:["REST API","Controllers","HttpGet/HttpPost","ActionResult","In-memory"],
+   what:"Enkelt API utan databas. ProductsController med in-memory produktlista.",
+   newFiles:["Controllers/ProductsController.cs","Models/Product.cs","Program.cs"]},
+  {num:2,title:"EF Core + SQLite / Code-First",folder:"Lektion-02",
+   topics:["EF Core","DbContext","SQLite","Code-First","Migrations","DbSet"],
+   what:"EF Core och SQLite. EShopContext med DbSet<Product>. Första migrationen.",
+   newFiles:["Data/eShopContext.cs","Entities/Product.cs","Data/Migrations/"]},
+  {num:3,title:"Relationer & Projektion (LINQ)",folder:"Lektion-03",
+   topics:["Navigeringsegenskaper","ForeignKey","LINQ .Select()","DTOs","Projektion"],
+   what:"Supplier-entity med relation till Product. Intro DTOs och LINQ-projektion.",
+   newFiles:["Entities/Supplier.cs","DTOs/PostProductDto.cs","Controllers/SuppliersController.cs"]},
+  {num:4,title:"Kunder, Kundvagn & CRUD",folder:"Lektion-04",
+   topics:["Full CRUD","Customer","Cart & CartItem","DTO-arv","Include() JOIN"],
+   what:"Customer, Cart och CartItem. Full CRUD för kunder. DTOs med BaseCustomerDto-arv.",
+   newFiles:["Entities/Customer.cs","Entities/Cart.cs","Entities/CartItem.cs","DTOs/Customers/","Controllers/CustomersController.cs","Controllers/CartsController.cs"]},
+  {num:5,title:"Postman Testdriven Utveckling",folder:"Lektion-05",
+   topics:["Postman tests","pm.test()","pm.collectionVariables","TDD","Status codes"],
+   what:"Automatiska tester i Postman, kollektionsvariabler och testdriven API-utveckling.",
+   newFiles:["(Postman collection med tester)"]},
+  {num:6,title:"SalesOrder & Payments",folder:"Lektion-06",
+   topics:["SalesOrder","OrderItem","PaymentsController","Atomär transaktion","SaveChangesAsync"],
+   what:"SalesOrder och PaymentsController. Checkout: Cart → SalesOrder atomärt.",
+   newFiles:["Entities/SalesOrder.cs","Entities/OrderItem.cs","Controllers/PaymentsController.cs"]},
+  {num:7,title:"ASP.NET Identity & Inloggning",folder:"Lektion-07",
+   topics:["ASP.NET Identity","UserManager","IdentityUser","IdentityRole","RoleManager"],
+   what:"ASP.NET Identity. User-entity, AuthController med register och login.",
+   newFiles:["Entities/User.cs","Controllers/AuthController.cs","DTOs/Auth/"]},
+  {num:8,title:"JWT — JSON Web Tokens",folder:"Lektion-08",
+   topics:["JWT","TokenService","Claims","HMAC-SHA512","Bearer token"],
+   what:"TokenService genererar JWT med claims och HMAC-SHA512. Bearer-autentisering.",
+   newFiles:["Services/TokenService.cs","(Program.cs uppdaterad med JWT-config)"]},
+  {num:9,title:"MySQL & Docker",folder:"Lektion-09",
+   topics:["MySQL","Docker","Connection strings","EF Core providers","Migrations"],
+   what:"Bytte SQLite mot MySQL via Docker. Ny migration och uppdaterad connection string.",
+   newFiles:["dockerfile","(appsettings.json uppdaterad)"]},
+  {num:10,title:"Docker Compose & PostgreSQL",folder:"Lektion-10",
+   topics:["docker-compose","PostgreSQL","Npgsql","Multi-container","SeedDatabase"],
+   what:"Docker Compose med API + databas som containers. PostgreSQL. SeedDatabase skapad.",
+   newFiles:["docker-compose.yml","dockerfile","Data/SeedDatabase.cs"]},
+  {num:11,title:"Repository Pattern (del 1)",folder:"Lektion-11",
+   topics:["Repository Pattern","IProductRepository","ISupplierRepository","Interfaces","Mock"],
+   what:"Repository Pattern introducerat. Interfaces, ProductRepository, SupplierRepository, MockSupplier.",
+   newFiles:["Interfaces/IProductRepository.cs","Interfaces/ISupplierRepository.cs","Repositories/ProductRepository.cs","Repositories/SupplierRepository.cs","Mock/MockSupplier.cs"]},
+  {num:12,title:"Unit of Work Pattern",folder:"Lektion-12",
+   topics:["Unit of Work","IUnitOfWork","ICustomerRepository","CustomerRepository"],
+   what:"Unit of Work pattern. ICustomerRepository. Alla repositories samlas i UnitOfWork.",
+   newFiles:["Data/UnitOfWork.cs","Interfaces/IUnitOfWork.cs","Interfaces/ICustomerRepository.cs","Repositories/CustomerRepository.cs"]},
+  {num:13,title:"Generic Repository & AutoMapper",folder:"Lektion-13",
+   topics:["Generic Repository","IGenericRepository<T>","GenericRepository<T>","AutoMapper","MappingProfiles","BaseEntity"],
+   what:"Generellt Repository: IGenericRepository<T> where T : BaseEntity. AutoMapper för automatisk mappning.",
+   newFiles:["Interfaces/IGenericRepository.cs","Repositories/GenericRepository.cs","Helpers/MappingProfiles.cs","Entities/BaseEntity.cs"]}
+];
+
+// ─── POSTMAN DATA (inlined from repo) ────────────────────────────────────────
+
+const PM_FLAT = { main: [{"folder": "Cart queries", "name": "Add new cart item", "method": "POST", "url": "{{url}}/carts", "body": "{\n    \"customerId\": 6,\n    \"productId\": 3,\n    \"quantity\": 5,\n    \"price\": 3.95\n}", "hasTests": true, "testCode": "var jsonData = pm.response.json();\n\npm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})\n\npm.collectionVariables.set(\"productId\", jsonData.productId);"}, {"folder": "Cart queries", "name": "List all carts", "method": "GET", "url": "{{url}}/carts", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Cart queries", "name": "Find cart", "method": "GET", "url": "{{url}}/carts/1", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Customer queries", "name": "Add new customer", "method": "POST", "url": "{{url}}/customers", "body": "{\n    \"firstName\": \"Eva\",\n    \"lastName\": \"Nilsson\",\n    \"email\": \"eva@mail.com\"\n}", "hasTests": true, "testCode": "var jsonData = pm.response.json();\n\npm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})\n\npm.test(\"Response body contains expected properties\",()=>{\n    pm.expect(jsonData).to.haveOwnProperty(\"customerId\");\n    pm.expect(jsonData).to.haveOwnProperty(\"firstName\");\n    pm.expect(jsonData).to.haveOwnProperty(\"lastName\");\n    pm.expect(jsonData).to.haveOwnProperty(\"email\");\n    pm.expect(jsonData).to.haveOwnProperty(\"phone\");\n});\n\n// Hämta kund id och placera i en global variabel...\npm.collectionVariables.set(\"customerId\",jsonData.customerId);"}, {"folder": "Customer queries", "name": "List all customers", "method": "GET", "url": "{{url}}/customers", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return the statuscode 200\",()=>{\n    pm.response.to.have.status(200);\n});"}, {"folder": "Customer queries", "name": "Find customer by id", "method": "GET", "url": "{{url}}/customers/{{customerId}}", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Customer queries", "name": "Update customer", "method": "PUT", "url": "{{url}}/customers/{{customerId}}", "body": "{\n    \"firstName\": \"Michael\",\n    \"lastName\": \"Gustafsson\",\n    \"email\": \"michael@gmail.com\"\n}", "hasTests": true, "testCode": "pm.test(\"Should return the statuscode 204\",()=>{\n    pm.response.to.have.status(204);\n});"}, {"folder": "Customer queries", "name": "Remove customer", "method": "DELETE", "url": "{{url}}/customers/2", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 204 as statuscode\",()=>{\n    pm.response.to.have.status(204);\n})"}, {"folder": "Customer queries", "name": "Display cart content", "method": "GET", "url": "{{url}}/customers/6/cart/", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Customer queries", "name": "List customer orders", "method": "GET", "url": "{{url}}/customers/6/orders", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Payment queries", "name": "Pay order", "method": "POST", "url": "{{url}}/payments?customerId=1", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Product queries", "name": "ListAllProducts", "method": "GET", "url": "{{url}}/products", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Product queries", "name": "Add a new product", "method": "POST", "url": "{{url}}/products", "body": "{\n    \"itemNumber\": \"0000854\",\n    \"productName\": \"Jordad elkabel\",\n    \"price\": 5.00,\n    \"description\": \"Enkel vit jordad elkabel\",\n    \"imageUrl\": \"\",\n    \"supplierId\": 1\n}", "hasTests": true, "testCode": "pm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})"}, {"folder": "Product queries", "name": "Find product by id", "method": "GET", "url": "{{url}}/products/4", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})"}, {"folder": "Product queries", "name": "Remove product", "method": "DELETE", "url": "{{url}}/products/17", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 204 as statuscode\",()=>{\n    pm.response.to.have.status(204);\n})"}, {"folder": "Product queries", "name": "Update product", "method": "PUT", "url": "{{url}}/products/4", "body": "{\n    \"itemNumber\": \"AA-12345\",\n    \"productName\": \"Jordad kontakt\",\n    \"price\": 33.95,\n    \"description\": \"Bra kontakt till priset!\"\n}", "hasTests": true, "testCode": "pm.test(\"Should return 204 as statuscode\",()=>{\n    pm.response.to.have.status(204);\n})"}, {"folder": "Product queries", "name": "Patch product price", "method": "PATCH", "url": "{{url}}/products/4", "body": "{\n    \"price\": 59.95\n}", "hasTests": true, "testCode": "pm.test(\"Should return 204 as statuscode\",()=>{\n    pm.response.to.have.status(204);\n})"}, {"folder": "Product queries", "name": "Find product by itemnumber", "method": "GET", "url": "{{url}}/products/product/AA-12345", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Supplier queries", "name": "ListAllSuppliers", "method": "GET", "url": "{{url}}/suppliers", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Supplier queries", "name": "Add supplier", "method": "POST", "url": "{{url}}/suppliers", "body": "{\n    \"supplierName\":\"Gelia\",\n    \"phone\": \"010-444555\",\n    \"email\": \"gelia@gmail.com\"\n}", "hasTests": true, "testCode": "pm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})"}, {"folder": "Supplier queries", "name": "Find supplier", "method": "GET", "url": "{{url}}/suppliers/1", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Authentication queries", "name": "Register user", "method": "POST", "url": "{{url}}/auth/register", "body": "{\n    \"email\":\"hanna@mail.com\",\n    \"password\": \"Pa$$w0rd\",\n    \"firstName\": \"Hanna\",\n    \"lastName\": \"Öberg\"\n}", "hasTests": true, "testCode": "var jsonData = pm.response.json();\n\npm.globals.set(\"token\",jsonData.token)"}, {"folder": "Authentication queries", "name": "Login user", "method": "POST", "url": "{{url}}/auth/login", "body": "{\n    \"email\": \"hanna@mail.com\",\n    \"password\": \"Pa$$w0rd\"\n}", "hasTests": true, "testCode": "var jsonData = pm.response.json();\n\npm.globals.set(\"token\",jsonData.token)"}, {"folder": "Authentication queries", "name": "Create role", "method": "POST", "url": "{{url}}/auth/role?roleName=User", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Authentication queries", "name": "Add user to role", "method": "POST", "url": "{{url}}/auth/userrole?userName=hanna@mail.com&roleName=Admin", "body": "", "hasTests": false, "testCode": ""}], l13: [{"folder": "Cart queries", "name": "Add new cart item", "method": "POST", "url": "{{url}}/carts", "body": "{\n    \"customerId\": 6,\n    \"productId\": 3,\n    \"quantity\": 5,\n    \"price\": 3.95\n}", "hasTests": true, "testCode": "var jsonData = pm.response.json();\n\npm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})\n\npm.collectionVariables.set(\"productId\", jsonData.productId);"}, {"folder": "Cart queries", "name": "List all carts", "method": "GET", "url": "{{url}}/carts", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Cart queries", "name": "Find cart", "method": "GET", "url": "{{url}}/carts/1", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Customer queries", "name": "Add new customer", "method": "POST", "url": "{{url}}/customers", "body": "{\n    \"firstName\": \"Eva\",\n    \"lastName\": \"Nilsson\",\n    \"email\": \"eva@mail.com\"\n}", "hasTests": true, "testCode": "var jsonData = pm.response.json();\n\npm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})\n\npm.test(\"Response body contains expected properties\",()=>{\n    pm.expect(jsonData).to.haveOwnProperty(\"customerId\");\n    pm.expect(jsonData).to.haveOwnProperty(\"firstName\");\n    pm.expect(jsonData).to.haveOwnProperty(\"lastName\");\n    pm.expect(jsonData).to.haveOwnProperty(\"email\");\n    pm.expect(jsonData).to.haveOwnProperty(\"phone\");\n});\n\n// Hämta kund id och placera i en global variabel...\npm.collectionVariables.set(\"customerId\",jsonData.customerId);"}, {"folder": "Customer queries", "name": "List all customers", "method": "GET", "url": "{{url}}/customers", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return the statuscode 200\",()=>{\n    pm.response.to.have.status(200);\n});"}, {"folder": "Customer queries", "name": "Find customer by id", "method": "GET", "url": "{{url}}/customers/1", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Customer queries", "name": "Update customer", "method": "PUT", "url": "{{url}}/customers/1", "body": "{\n    \"firstName\": \"Eva-Lena\",\n    \"lastName\": \"Nilsson\",\n    \"email\": \"eva-lena@mail.com\"\n}", "hasTests": true, "testCode": "pm.test(\"Should return the statuscode 204\",()=>{\n    pm.response.to.have.status(204);\n});"}, {"folder": "Customer queries", "name": "Remove customer", "method": "DELETE", "url": "{{url}}/customers/1", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 204 as statuscode\",()=>{\n    pm.response.to.have.status(204);\n})"}, {"folder": "Customer queries", "name": "Display cart content", "method": "GET", "url": "{{url}}/customers/6/cart/", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Customer queries", "name": "List customer orders", "method": "GET", "url": "{{url}}/customers/6/orders", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Payment queries", "name": "Pay order", "method": "POST", "url": "{{url}}/payments?customerId=1", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Product queries", "name": "ListAllProducts", "method": "GET", "url": "{{url}}/products", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Product queries", "name": "Add a new product", "method": "POST", "url": "{{url}}/products", "body": "{\n    \"imageUrl\": \"Lingon.jpg\",\n    \"description\": \"En spröd skorpa med doft och smak av lingon.\",\n    \"name\": \"Lingon skorpa\",\n    \"itemNumber\": \"80\",\n    \"productName\": \"Lingon skorpan\",\n    \"price\": 18.0,\n    \"supplierId\":1\n}", "hasTests": true, "testCode": "pm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})"}, {"folder": "Product queries", "name": "Find product by id", "method": "GET", "url": "{{url}}/products/1", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})"}, {"folder": "Product queries", "name": "Delete a product", "method": "DELETE", "url": "{{url}}/products/5", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 204 as statuscode\",()=>{\n    pm.response.to.have.status(204);\n})"}, {"folder": "Product queries", "name": "Update product", "method": "PUT", "url": "{{url}}/products/5", "body": "{\n    \"supplierId\": 1,\n    \"itemNumber\": \"80\",\n    \"productName\": \"Lingon skorpan updated\",\n    \"price\": 18.0,\n    \"imageUrl\": \"Lingon.jpg\",\n    \"description\": \"En spröd skorpa med doft och smak av lingon.\"\n}", "hasTests": true, "testCode": "pm.test(\"Should return 204 as statuscode\",()=>{\n    pm.response.to.have.status(204);\n})"}, {"folder": "Product queries", "name": "Patch product price", "method": "PATCH", "url": "{{url}}/products/4", "body": "{\n    \"price\": 59.95\n}", "hasTests": true, "testCode": "pm.test(\"Should return 204 as statuscode\",()=>{\n    pm.response.to.have.status(204);\n})"}, {"folder": "Product queries", "name": "Find product by itemnumber", "method": "GET", "url": "{{url}}/products/product/20", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Supplier queries", "name": "ListAllSuppliers", "method": "GET", "url": "{{url}}/suppliers", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Supplier queries", "name": "Add supplier", "method": "POST", "url": "{{url}}/suppliers", "body": "{\n    \"supplierName\": \"Test AB 2\",\n    \"phone\": \"0303-666777\",\n    \"email\": \"test.info@gmail.com\",\n    \"address\": \"Gatan 15\",\n    \"postalCode\": \"44444\",\n    \"city\": \"Stenungsund\"\n}", "hasTests": true, "testCode": "pm.test(\"Should return 201 as statuscode\",()=>{\n    pm.response.to.have.status(201);\n})"}, {"folder": "Supplier queries", "name": "Find supplier", "method": "GET", "url": "{{url}}/suppliers/4", "body": "", "hasTests": true, "testCode": "pm.test(\"Should return 200 as statuscode\",()=>{\n    pm.response.to.have.status(200);\n})"}, {"folder": "Supplier queries", "name": "Update a supplier", "method": "PUT", "url": "{{url}}/suppliers/5", "body": "{\n\"supplierName\": \"Test AB\",\n\"address\": \"Gatan 25\",\n\"postalCode\": \"12345\",\n\"city\": \"Stenungsund\",\n\"phone\": \"0303-999888\",\n\"email\": \"test.info@gmail.com\"\n}", "hasTests": false, "testCode": ""}, {"folder": "Supplier queries", "name": "Delete a supplier", "method": "DELETE", "url": "{{url}}/suppliers/5", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Authentication queries", "name": "Register user", "method": "POST", "url": "{{url}}/auth/register", "body": "{\n    \"email\":\"hanna@mail.com\",\n    \"password\": \"Pa$$w0rd\",\n    \"firstName\": \"Hanna\",\n    \"lastName\": \"Öberg\"\n}", "hasTests": true, "testCode": "var jsonData = pm.response.json();\n\npm.globals.set(\"token\",jsonData.token)"}, {"folder": "Authentication queries", "name": "Login user", "method": "POST", "url": "{{url}}/auth/login", "body": "{\n    \"email\": \"hanna@mail.com\",\n    \"password\": \"Pa$$w0rd\"\n}", "hasTests": true, "testCode": "var jsonData = pm.response.json();\n\npm.globals.set(\"token\",jsonData.token)"}, {"folder": "Authentication queries", "name": "Create role", "method": "POST", "url": "{{url}}/auth/role?roleName=User", "body": "", "hasTests": false, "testCode": ""}, {"folder": "Authentication queries", "name": "Add user to role", "method": "POST", "url": "{{url}}/auth/userrole?userName=hanna@mail.com&roleName=Admin", "body": "", "hasTests": false, "testCode": ""}] };
+const PM_FULL = { main: {"info": {"_postman_id": "a82b686e-15e5-4b1e-9b19-f73401d324fa", "name": "E-Shop", "description": "En samling av frågor för att testa vårt eshop api", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json", "_exporter_id": "19056603", "_collection_link": "https://go.postman.co/collection/19056603-a82b686e-15e5-4b1e-9b19-f73401d324fa?source=collection_link"}, "item": [{"name": "Cart queries", "item": [{"name": "Add new cart item", "event": [{"listen": "test", "script": {"exec": ["var jsonData = pm.response.json();", "", "pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})", "", "pm.collectionVariables.set(\"productId\", jsonData.productId);"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"customerId\": 6,\n    \"productId\": 3,\n    \"quantity\": 5,\n    \"price\": 3.95\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/carts", "host": ["{{url}}"], "path": ["carts"]}}, "response": []}, {"name": "List all carts", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/carts", "host": ["{{url}}"], "path": ["carts"]}}, "response": []}, {"name": "Find cart", "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/carts/1", "host": ["{{url}}"], "path": ["carts", "1"]}}, "response": []}]}, {"name": "Customer queries", "item": [{"name": "Add new customer", "event": [{"listen": "test", "script": {"exec": ["var jsonData = pm.response.json();", "", "pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})", "", "pm.test(\"Response body contains expected properties\",()=>{", "    pm.expect(jsonData).to.haveOwnProperty(\"customerId\");", "    pm.expect(jsonData).to.haveOwnProperty(\"firstName\");", "    pm.expect(jsonData).to.haveOwnProperty(\"lastName\");", "    pm.expect(jsonData).to.haveOwnProperty(\"email\");", "    pm.expect(jsonData).to.haveOwnProperty(\"phone\");", "});", "", "// Hämta kund id och placera i en global variabel...", "pm.collectionVariables.set(\"customerId\",jsonData.customerId);"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"firstName\": \"Eva\",\n    \"lastName\": \"Nilsson\",\n    \"email\": \"eva@mail.com\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/customers", "host": ["{{url}}"], "path": ["customers"]}}, "response": []}, {"name": "List all customers", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return the statuscode 200\",()=>{", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [], "url": {"raw": "{{url}}/customers", "host": ["{{url}}"], "path": ["customers"]}}, "response": []}, {"name": "Find customer by id", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [], "url": {"raw": "{{url}}/customers/{{customerId}}", "host": ["{{url}}"], "path": ["customers", "{{customerId}}"]}}, "response": []}, {"name": "Update customer", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return the statuscode 204\",()=>{", "    pm.response.to.have.status(204);", "});"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "PUT", "header": [], "body": {"mode": "raw", "raw": "{\n    \"firstName\": \"Michael\",\n    \"lastName\": \"Gustafsson\",\n    \"email\": \"michael@gmail.com\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/customers/{{customerId}}", "host": ["{{url}}"], "path": ["customers", "{{customerId}}"]}}, "response": []}, {"name": "Remove customer", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 204 as statuscode\",()=>{", "    pm.response.to.have.status(204);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "DELETE", "header": [], "url": {"raw": "{{url}}/customers/2", "host": ["{{url}}"], "path": ["customers", "2"]}}, "response": []}, {"name": "Display cart content", "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/customers/6/cart/", "host": ["{{url}}"], "path": ["customers", "6", "cart", ""]}}, "response": []}, {"name": "List customer orders", "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/customers/6/orders", "host": ["{{url}}"], "path": ["customers", "6", "orders"]}}, "response": []}]}, {"name": "Payment queries", "item": [{"name": "Pay order", "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/payments?customerId=1", "host": ["{{url}}"], "path": ["payments"], "query": [{"key": "customerId", "value": "1"}]}}, "response": []}]}, {"name": "Product queries", "item": [{"name": "ListAllProducts", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "bearer", "bearer": [{"key": "token", "value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJoYW5uYUBtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJoYW5uYUBtYWlsLmNvbSIsIkZpcnN0TmFtZSI6Ikhhbm5hIiwiTGFzdE5hbWUiOiLDlmJlcmciLCJJZCI6ImFmOGE3NjU2LWEzNzAtNDg0Yy1hNzE1LWQ5MTU5ZmZhNmQwYiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3NzQzNjA0NjZ9.vadI8juItMg5RlkO6-tMtyuUAQUBU8ATEO7bAPq5nShB8ddItEwWAYwZpn_LaGSdyZYggydZRM3Ced6iFCsEaw", "type": "string"}]}, "method": "GET", "header": [], "url": {"raw": "{{url}}/products", "host": ["{{url}}"], "path": ["products"]}}, "response": []}, {"name": "Add a new product", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"itemNumber\": \"0000854\",\n    \"productName\": \"Jordad elkabel\",\n    \"price\": 5.00,\n    \"description\": \"Enkel vit jordad elkabel\",\n    \"imageUrl\": \"\",\n    \"supplierId\": 1\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/products", "host": ["{{url}}"], "path": ["products"]}}, "response": []}, {"name": "Find product by id", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/products/4", "host": ["{{url}}"], "path": ["products", "4"]}}, "response": []}, {"name": "Remove product", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 204 as statuscode\",()=>{", "    pm.response.to.have.status(204);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "DELETE", "header": [], "url": {"raw": "{{url}}/products/17", "host": ["{{url}}"], "path": ["products", "17"]}}, "response": []}, {"name": "Update product", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 204 as statuscode\",()=>{", "    pm.response.to.have.status(204);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "PUT", "header": [], "body": {"mode": "raw", "raw": "{\n    \"itemNumber\": \"AA-12345\",\n    \"productName\": \"Jordad kontakt\",\n    \"price\": 33.95,\n    \"description\": \"Bra kontakt till priset!\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/products/4", "host": ["{{url}}"], "path": ["products", "4"]}}, "response": []}, {"name": "Patch product price", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 204 as statuscode\",()=>{", "    pm.response.to.have.status(204);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "PATCH", "header": [], "body": {"mode": "raw", "raw": "{\n    \"price\": 59.95\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/products/4", "host": ["{{url}}"], "path": ["products", "4"]}}, "response": []}, {"name": "Find product by itemnumber", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/products/product/AA-12345", "host": ["{{url}}"], "path": ["products", "product", "AA-12345"]}}, "response": []}]}, {"name": "Supplier queries", "item": [{"name": "ListAllSuppliers", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/suppliers", "host": ["{{url}}"], "path": ["suppliers"]}}, "response": []}, {"name": "Add supplier", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"supplierName\":\"Gelia\",\n    \"phone\": \"010-444555\",\n    \"email\": \"gelia@gmail.com\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/suppliers", "host": ["{{url}}"], "path": ["suppliers"]}}, "response": []}, {"name": "Find supplier", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/suppliers/1", "host": ["{{url}}"], "path": ["suppliers", "1"]}}, "response": []}]}, {"name": "Authentication queries", "item": [{"name": "Register user", "event": [{"listen": "test", "script": {"exec": ["var jsonData = pm.response.json();", "", "pm.globals.set(\"token\",jsonData.token)"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "noauth"}, "method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"email\":\"hanna@mail.com\",\n    \"password\": \"Pa$$w0rd\",\n    \"firstName\": \"Hanna\",\n    \"lastName\": \"Öberg\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/auth/register", "host": ["{{url}}"], "path": ["auth", "register"]}}, "response": []}, {"name": "Login user", "event": [{"listen": "test", "script": {"exec": ["var jsonData = pm.response.json();", "", "pm.globals.set(\"token\",jsonData.token)"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "noauth"}, "method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"email\": \"hanna@mail.com\",\n    \"password\": \"Pa$$w0rd\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/auth/login", "host": ["{{url}}"], "path": ["auth", "login"]}}, "response": []}, {"name": "Create role", "request": {"auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]}, "method": "POST", "header": [], "url": {"raw": "{{url}}/auth/role?roleName=User", "host": ["{{url}}"], "path": ["auth", "role"], "query": [{"key": "roleName", "value": "User"}]}}, "response": []}, {"name": "Add user to role", "request": {"auth": {"type": "noauth"}, "method": "POST", "header": [], "url": {"raw": "{{url}}/auth/userrole?userName=hanna@mail.com&roleName=Admin", "host": ["{{url}}"], "path": ["auth", "userrole"], "query": [{"key": "userName", "value": "hanna@mail.com"}, {"key": "roleName", "value": "Admin"}]}}, "response": []}]}]}, l13: {"info": {"_postman_id": "a82b686e-15e5-4b1e-9b19-f73401d324fa", "name": "E-Shop", "description": "En samling av frågor för att testa vårt eshop api", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json", "_exporter_id": "19056603", "_collection_link": "https://go.postman.co/collection/19056603-a82b686e-15e5-4b1e-9b19-f73401d324fa?source=collection_link"}, "item": [{"name": "Cart queries", "item": [{"name": "Add new cart item", "event": [{"listen": "test", "script": {"exec": ["var jsonData = pm.response.json();", "", "pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})", "", "pm.collectionVariables.set(\"productId\", jsonData.productId);"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"customerId\": 6,\n    \"productId\": 3,\n    \"quantity\": 5,\n    \"price\": 3.95\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/carts", "host": ["{{url}}"], "path": ["carts"]}}, "response": []}, {"name": "List all carts", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/carts", "host": ["{{url}}"], "path": ["carts"]}}, "response": []}, {"name": "Find cart", "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/carts/1", "host": ["{{url}}"], "path": ["carts", "1"]}}, "response": []}]}, {"name": "Customer queries", "item": [{"name": "Add new customer", "event": [{"listen": "test", "script": {"exec": ["var jsonData = pm.response.json();", "", "pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})", "", "pm.test(\"Response body contains expected properties\",()=>{", "    pm.expect(jsonData).to.haveOwnProperty(\"customerId\");", "    pm.expect(jsonData).to.haveOwnProperty(\"firstName\");", "    pm.expect(jsonData).to.haveOwnProperty(\"lastName\");", "    pm.expect(jsonData).to.haveOwnProperty(\"email\");", "    pm.expect(jsonData).to.haveOwnProperty(\"phone\");", "});", "", "// Hämta kund id och placera i en global variabel...", "pm.collectionVariables.set(\"customerId\",jsonData.customerId);"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"firstName\": \"Eva\",\n    \"lastName\": \"Nilsson\",\n    \"email\": \"eva@mail.com\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/customers", "host": ["{{url}}"], "path": ["customers"]}}, "response": []}, {"name": "List all customers", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return the statuscode 200\",()=>{", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [], "url": {"raw": "{{url}}/customers", "host": ["{{url}}"], "path": ["customers"]}}, "response": []}, {"name": "Find customer by id", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [], "url": {"raw": "{{url}}/customers/1", "host": ["{{url}}"], "path": ["customers", "1"]}}, "response": []}, {"name": "Update customer", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return the statuscode 204\",()=>{", "    pm.response.to.have.status(204);", "});"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "PUT", "header": [], "body": {"mode": "raw", "raw": "{\n    \"firstName\": \"Eva-Lena\",\n    \"lastName\": \"Nilsson\",\n    \"email\": \"eva-lena@mail.com\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/customers/1", "host": ["{{url}}"], "path": ["customers", "1"]}}, "response": []}, {"name": "Remove customer", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 204 as statuscode\",()=>{", "    pm.response.to.have.status(204);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "DELETE", "header": [], "url": {"raw": "{{url}}/customers/1", "host": ["{{url}}"], "path": ["customers", "1"]}}, "response": []}, {"name": "Display cart content", "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/customers/6/cart/", "host": ["{{url}}"], "path": ["customers", "6", "cart", ""]}}, "response": []}, {"name": "List customer orders", "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/customers/6/orders", "host": ["{{url}}"], "path": ["customers", "6", "orders"]}}, "response": []}]}, {"name": "Payment queries", "item": [{"name": "Pay order", "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/payments?customerId=1", "host": ["{{url}}"], "path": ["payments"], "query": [{"key": "customerId", "value": "1"}]}}, "response": []}]}, {"name": "Product queries", "item": [{"name": "ListAllProducts", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "bearer", "bearer": [{"key": "token", "value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJoYW5uYUBtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJoYW5uYUBtYWlsLmNvbSIsIkZpcnN0TmFtZSI6Ikhhbm5hIiwiTGFzdE5hbWUiOiLDlmJlcmciLCJJZCI6ImFmOGE3NjU2LWEzNzAtNDg0Yy1hNzE1LWQ5MTU5ZmZhNmQwYiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3NzQzNjA0NjZ9.vadI8juItMg5RlkO6-tMtyuUAQUBU8ATEO7bAPq5nShB8ddItEwWAYwZpn_LaGSdyZYggydZRM3Ced6iFCsEaw", "type": "string"}]}, "method": "GET", "header": [], "url": {"raw": "{{url}}/products", "host": ["{{url}}"], "path": ["products"]}}, "response": []}, {"name": "Add a new product", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"imageUrl\": \"Lingon.jpg\",\n    \"description\": \"En spröd skorpa med doft och smak av lingon.\",\n    \"name\": \"Lingon skorpa\",\n    \"itemNumber\": \"80\",\n    \"productName\": \"Lingon skorpan\",\n    \"price\": 18.0,\n    \"supplierId\":1\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/products", "host": ["{{url}}"], "path": ["products"]}}, "response": []}, {"name": "Find product by id", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/products/1", "host": ["{{url}}"], "path": ["products", "1"]}}, "response": []}, {"name": "Delete a product", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 204 as statuscode\",()=>{", "    pm.response.to.have.status(204);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "DELETE", "header": [], "url": {"raw": "{{url}}/products/5", "host": ["{{url}}"], "path": ["products", "5"]}}, "response": []}, {"name": "Update product", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 204 as statuscode\",()=>{", "    pm.response.to.have.status(204);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "PUT", "header": [], "body": {"mode": "raw", "raw": "{\n    \"supplierId\": 1,\n    \"itemNumber\": \"80\",\n    \"productName\": \"Lingon skorpan updated\",\n    \"price\": 18.0,\n    \"imageUrl\": \"Lingon.jpg\",\n    \"description\": \"En spröd skorpa med doft och smak av lingon.\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/products/5", "host": ["{{url}}"], "path": ["products", "5"]}}, "response": []}, {"name": "Patch product price", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 204 as statuscode\",()=>{", "    pm.response.to.have.status(204);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "PATCH", "header": [], "body": {"mode": "raw", "raw": "{\n    \"price\": 59.95\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/products/4", "host": ["{{url}}"], "path": ["products", "4"]}}, "response": []}, {"name": "Find product by itemnumber", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/products/product/20", "host": ["{{url}}"], "path": ["products", "product", "20"]}}, "response": []}]}, {"name": "Supplier queries", "item": [{"name": "ListAllSuppliers", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/suppliers", "host": ["{{url}}"], "path": ["suppliers"]}}, "response": []}, {"name": "Add supplier", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 201 as statuscode\",()=>{", "    pm.response.to.have.status(201);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"supplierName\": \"Test AB 2\",\n    \"phone\": \"0303-666777\",\n    \"email\": \"test.info@gmail.com\",\n    \"address\": \"Gatan 15\",\n    \"postalCode\": \"44444\",\n    \"city\": \"Stenungsund\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/suppliers", "host": ["{{url}}"], "path": ["suppliers"]}}, "response": []}, {"name": "Find supplier", "event": [{"listen": "test", "script": {"exec": ["pm.test(\"Should return 200 as statuscode\",()=>{", "    pm.response.to.have.status(200);", "})"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"method": "GET", "header": [], "url": {"raw": "{{url}}/suppliers/4", "host": ["{{url}}"], "path": ["suppliers", "4"]}}, "response": []}, {"name": "Update a supplier", "request": {"method": "PUT", "header": [], "body": {"mode": "raw", "raw": "{\n\"supplierName\": \"Test AB\",\n\"address\": \"Gatan 25\",\n\"postalCode\": \"12345\",\n\"city\": \"Stenungsund\",\n\"phone\": \"0303-999888\",\n\"email\": \"test.info@gmail.com\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/suppliers/5", "host": ["{{url}}"], "path": ["suppliers", "5"]}}, "response": []}, {"name": "Delete a supplier", "request": {"auth": {"type": "bearer", "bearer": [{"key": "token", "value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJoYW5uYUBtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJoYW5uYUBtYWlsLmNvbSIsIkZpcnN0TmFtZSI6Ikhhbm5hIiwiTGFzdE5hbWUiOiLDlmJlcmciLCJJZCI6ImFmOGE3NjU2LWEzNzAtNDg0Yy1hNzE1LWQ5MTU5ZmZhNmQwYiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3NzQzNjA0NjZ9.vadI8juItMg5RlkO6-tMtyuUAQUBU8ATEO7bAPq5nShB8ddItEwWAYwZpn_LaGSdyZYggydZRM3Ced6iFCsEaw", "type": "string"}]}, "method": "DELETE", "header": [], "url": {"raw": "{{url}}/suppliers/5", "host": ["{{url}}"], "path": ["suppliers", "5"]}}, "response": []}]}, {"name": "Authentication queries", "item": [{"name": "Register user", "event": [{"listen": "test", "script": {"exec": ["var jsonData = pm.response.json();", "", "pm.globals.set(\"token\",jsonData.token)"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "noauth"}, "method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"email\":\"hanna@mail.com\",\n    \"password\": \"Pa$$w0rd\",\n    \"firstName\": \"Hanna\",\n    \"lastName\": \"Öberg\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/auth/register", "host": ["{{url}}"], "path": ["auth", "register"]}}, "response": []}, {"name": "Login user", "event": [{"listen": "test", "script": {"exec": ["var jsonData = pm.response.json();", "", "pm.globals.set(\"token\",jsonData.token)"], "type": "text/javascript", "packages": {}, "requests": {}}}], "request": {"auth": {"type": "noauth"}, "method": "POST", "header": [], "body": {"mode": "raw", "raw": "{\n    \"email\": \"hanna@mail.com\",\n    \"password\": \"Pa$$w0rd\"\n}", "options": {"raw": {"language": "json"}}}, "url": {"raw": "{{url}}/auth/login", "host": ["{{url}}"], "path": ["auth", "login"]}}, "response": []}, {"name": "Create role", "request": {"auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]}, "method": "POST", "header": [], "url": {"raw": "{{url}}/auth/role?roleName=User", "host": ["{{url}}"], "path": ["auth", "role"], "query": [{"key": "roleName", "value": "User"}]}}, "response": []}, {"name": "Add user to role", "request": {"auth": {"type": "noauth"}, "method": "POST", "header": [], "url": {"raw": "{{url}}/auth/userrole?userName=hanna@mail.com&roleName=Admin", "host": ["{{url}}"], "path": ["auth", "userrole"], "query": [{"key": "userName", "value": "hanna@mail.com"}, {"key": "roleName", "value": "Admin"}]}}, "response": []}]}]} };
+
+
+// ─── SEARCH INDEX ─────────────────────────────────────────────────────────────
+const IDX = [];
+Object.entries(PAGES).forEach(([k,p]) => {
+  IDX.push({type:'page',key:k,title:p.title,file:p.file,tag:p.tagLbl,tagCls:p.tagCls,text:p.desc});
+  (p.methods||[]).forEach(m => {
+    IDX.push({type:'method',key:k,title:p.title+' \u2192 '+m.name,file:p.file,tag:p.tagLbl,tagCls:p.tagCls,text:m.desc,code:m.code,methodName:m.name});
+  });
+});
+CONCEPTS.forEach(c => {
+  IDX.push({type:'concept',key:c.id,title:c.title,file:c.category,tag:'Koncept',tagCls:'tkw',text:c.desc,code:c.code,tags:c.tags.join(' ')});
+});
+
+// ─── SIDEBAR ──────────────────────────────────────────────────────────────────
+(function buildSidebar() {
+  const sb = document.getElementById('SIDEBAR');
+  const items = [
+    {head:'Navigera'},
+    {id:'overview', dot:'var(--blue)', label:'Översikt'},
+    {id:'folders',  dot:'var(--txd)',  label:'Mappstruktur'},
+    {id:'concepts', dot:'var(--pnk)',  label:'C# Begrepp'},
+    {id:'lessons',  dot:'var(--green)',label:'&#128218; Lektioner'},
+    {id:'postman',  dot:'var(--ora)',  label:'&#128236; Postman'},
+    {id:'videos',   dot:'#ff4444',     label:'&#9654; Lägg till videos'},
+    {head:'Controllers'},
+    {id:'AuthCtrl', dot:'var(--blue)', label:'AuthController'},
+    {id:'CartsCtrl',dot:'var(--blue)', label:'CartsController'},
+    {id:'CustCtrl', dot:'var(--blue)', label:'CustomersController'},
+    {id:'PayCtrl',  dot:'var(--blue)', label:'PaymentsController'},
+    {id:'ProdCtrl', dot:'var(--blue)', label:'ProductsController'},
+    {id:'SuppCtrl', dot:'var(--blue)', label:'SuppliersController'},
+    {head:'Repositories'},
+    {id:'ProdRepo', dot:'var(--ora)',  label:'ProductRepository'},
+    {id:'SuppRepo', dot:'var(--ora)',  label:'SupplierRepository'},
+    {head:'Interfaces'},
+    {id:'Ifaces',   dot:'var(--pur)',  label:'IProductRepository'},
+    {head:'Entities & DTOs'},
+    {id:'Entities', dot:'var(--green)',label:'Alla Entities'},
+    {id:'DTOs',     dot:'#fb923c',     label:'Alla DTOs'},
+    {head:'Services & Data'},
+    {id:'TokenSvc', dot:'var(--cya)',  label:'TokenService'},
+    {id:'DbCtx',    dot:'#6ee7b7',     label:'EShopContext'},
+    {id:'Seed',     dot:'#6ee7b7',     label:'SeedDatabase'},
+    {id:'ProgCs',   dot:'#e879f9',     label:'Program.cs'},
+  ];
+  let html = '';
+  items.forEach(item => {
+    if (item.head) {
+      html += '<div class="sh">' + item.head + '</div>';
+    } else {
+      html += '<div class="si" id="n-' + item.id + '" onclick="nav(\'' + item.id + '\')">';
+      html += '<span class="sdot" style="background:' + item.dot + '"></span>';
+      html += item.label + '</div>';
+    }
+  });
+  sb.innerHTML = html;
+})();
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let curPage = 'overview';
+let aiOpen = false;
+
+// ─── SEARCH ───────────────────────────────────────────────────────────────────
+document.getElementById('SI').addEventListener('input', function() {
+  const v = this.value.trim();
+  document.getElementById('CLR').classList.toggle('on', v.length > 0);
+  if (v.length >= 1) doSearch(v);
+  else showPage(curPage);
+});
+
+function clrSearch() {
+  document.getElementById('SI').value = '';
+  document.getElementById('CLR').classList.remove('on');
+  showPage(curPage);
+}
+
+function doSearch(q) {
+  const ql = q.toLowerCase().trim();
+  const concept = CONCEPTS.find(c => c.tags.includes(ql) || c.id === ql || c.title.toLowerCase() === ql);
+  if (concept) { renderConceptPage(concept); return; }
+  const scored = IDX.map(item => {
+    let s = 0;
+    const tl = item.title.toLowerCase();
+    const tx = (item.text||'').toLowerCase();
+    const tg = (item.tags||'').toLowerCase();
+    if (tl === ql) s += 100;
+    else if (tl.startsWith(ql)) s += 60;
+    else if (tl.includes(ql)) s += 40;
+    if (tg.includes(ql)) s += 35;
+    if (tx.includes(ql)) s += 20;
+    return {...item, score:s};
+  }).filter(i => i.score > 0).sort((a,b) => b.score - a.score);
+  renderSearchResults(q, scored);
+}
+
+function hl2(t, q) {
+  const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
+  return H(t).replace(re, '<mark>$1</mark>');
+}
+
+function renderSearchResults(q, results) {
+  setNav(null);
+  const main = document.getElementById('MAIN');
+  if (!results.length) {
+    main.innerHTML = '<div class="ptit">Sökning: "' + H(q) + '"</div><div class="psub">Inga träffar. Prova: async, dto, interface, record, linq, jwt, repository</div>';
+    return;
+  }
+  let html = '<div class="ptit">Sökning: "' + H(q) + '"</div>';
+  html += '<div class="rh">Hittade <strong>' + results.length + '</strong> resultat</div>';
+  results.slice(0,18).forEach(r => {
+    html += '<div class="ri" onclick="goRes(\'' + r.type + '\',\'' + r.key + '\',\'' + encodeURIComponent(r.methodName||'') + '\')">';
+    html += '<div class="ritit"><span class="tag ' + r.tagCls + '" style="font-size:9px">' + r.tag + '</span>';
+    html += hl2(r.title, q) + '</div>';
+    html += '<div class="risub">' + hl2((r.text||'').slice(0,130), q) + '</div>';
+    html += '</div>';
+  });
+  main.innerHTML = html;
+  main.scrollTop = 0;
+}
+
+function goRes(type, key, methodName) {
+  document.getElementById('SI').value = '';
+  document.getElementById('CLR').classList.remove('on');
+  if (type === 'concept') {
+    const c = CONCEPTS.find(x => x.id === key);
+    if (c) renderConceptPage(c);
+  } else {
+    showPage(key);
+    if (methodName) {
+      const dec = decodeURIComponent(methodName);
+      setTimeout(() => {
+        document.querySelectorAll('.mname').forEach(el => {
+          if (el.textContent.trim() === dec) {
+            el.closest('.mhd')?.click();
+            el.closest('.method')?.scrollIntoView({behavior:'smooth', block:'center'});
+          }
+        });
+      }, 150);
+    }
+  }
+}
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+function setNav(key) {
+  document.querySelectorAll('.si').forEach(el => el.classList.remove('act'));
+  if (key) { const n = document.getElementById('n-' + key); if(n) n.classList.add('act'); }
+}
+
+function nav(key) {
+  document.getElementById('SI').value = '';
+  document.getElementById('CLR').classList.remove('on');
+  showPage(key);
+}
+
+function showPage(key) {
+  curPage = key;
+  setNav(key);
+  const main = document.getElementById('MAIN');
+  if      (key === 'overview') main.innerHTML = renderOverview();
+  else if (key === 'folders')  main.innerHTML = renderFolders();
+  else if (key === 'concepts') main.innerHTML = renderAllConcepts();
+  else if (key === 'lessons')  main.innerHTML = renderLessons();
+  else if (key === 'postman')  { main.innerHTML = renderPostman(); }
+  else if (key === 'videos')   main.innerHTML = renderVideos();
+  else if (PAGES[key])         main.innerHTML = renderPageFull(PAGES[key]);
+  main.scrollTop = 0;
+}
+
+// ─── PAGE RENDERERS ───────────────────────────────────────────────────────────
+function renderPageFull(p) {
+  let html = '<div class="ptit">' + H(p.title) + '</div>';
+  html += '<div class="psub">' + H(p.file);
+  if (p.route) html += ' &middot; Route: <code style="font-family:var(--mono)">' + H(p.route) + '</code>';
+  html += '</div>';
+  html += '<div class="card"><div class="chd"><div class="ctit">' + H(p.title);
+  html += '<span class="tag ' + p.tagCls + '">' + p.tagLbl + '</span></div></div>';
+  html += '<div class="cbd"><div class="desc">' + H(p.desc) + '</div>';
+  html += renderMethods(p.methods||[]);
+  if (p.ytTopic) html += renderYtSection(p.ytTopic);
+  html += '</div></div>';
+  return html;
+}
+
+function renderConceptPage(c) {
+  setNav(null);
+  const cols = ['var(--blue)','var(--green)','var(--ora)','var(--pur)'];
+  let stepsHtml = '';
+  if (c.steps) {
+    stepsHtml = '<div class="steps-list">';
+    c.steps.forEach((s, i) => {
+      stepsHtml += '<div class="step">';
+      stepsHtml += '<div class="snum2" style="background:' + cols[i%4] + '">' + (i+1) + '</div>';
+      stepsHtml += '<div class="step-txt">' + H(s) + '</div></div>';
+    });
+    stepsHtml += '</div>';
+  }
+  let html = '<div class="ptit">' + H(c.title) + '</div>';
+  html += '<div class="psub">' + H(c.category) + ' &middot; ' + H(c.projectRef) + '</div>';
+  html += '<div class="card"><div class="chd"><div class="ctit">' + H(c.title);
+  html += '<span class="tag tkw">C# Koncept</span></div></div>';
+  html += '<div class="cbd"><div class="desc">' + H(c.desc) + '</div>';
+  html += stepsHtml;
+  html += '<div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--txd)">Kod från projektet:</div>';
+  html += mkCode(c.code);
+  html += '<div style="font-size:11.5px;color:var(--txm);font-family:var(--mono);margin-top:10px">📁 ' + H(c.projectRef) + '</div>';
+  if (c.id) html += renderYtSection(c.id);
+  html += '</div></div>';
+  const main = document.getElementById('MAIN');
+  main.innerHTML = html;
+  main.scrollTop = 0;
+}
+
+function renderAllConcepts() {
+  const grouped = {};
+  CONCEPTS.forEach(c => { if(!grouped[c.category]) grouped[c.category]=[]; grouped[c.category].push(c); });
+  let html = '<div class="ptit">C# &amp; ASP.NET Core Begrepp</div>';
+  html += '<div class="psub">Klicka för djupförklaring med steg och kod</div>';
+  html += '<div class="tip">💡 <strong>Sök ett ord:</strong> async &middot; dto &middot; interface &middot; record &middot; linq &middot; jwt &middot; repository &middot; di &middot; navigeringsegenskap &middot; genericrepo</div>';
+  Object.entries(grouped).forEach(([cat, cs]) => {
+    html += '<div style="margin:18px 0 6px;font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txm);text-transform:uppercase">' + H(cat) + '</div>';
+    html += '<div class="fgrid">';
+    cs.forEach(c => {
+      html += '<div class="fcrd" onclick="renderConceptPage(CONCEPTS.find(x=>x.id===\'' + c.id + '\'))">';
+      html += '<div style="font-family:var(--mono);font-size:13px;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:7px">' + H(c.title);
+      html += '<span class="tag tkw" style="font-size:9px">' + H(c.category) + '</span></div>';
+      html += '<div style="font-size:12.5px;color:var(--txd)">' + H(c.desc.slice(0,90)) + '...</div>';
+      html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">';
+      c.tags.slice(0,4).forEach(t => { html += '<span class="pill">' + H(t) + '</span>'; });
+      html += '</div></div>';
+    });
+    html += '</div>';
+  });
+  return html;
+}
+
+function renderFolders() {
+  const folders = [
+    {path:'Controllers/', col:'var(--blue)',  ic:'🎮', desc:'HTTP-lagret. Tar request, delegerar, returnerar response. Vet ingenting om EF Core.', files:['AuthController','CartsController','CustomersController','PaymentsController','ProductsController','SuppliersController'], k:'AuthCtrl'},
+    {path:'Entities/',    col:'var(--green)', ic:'🗂️', desc:'Databasmodeller. record = immutable. class = mutable. Navigeringsegenskaper för JOINs.', files:['Cart','CartItem','Customer','OrderItem','Product','SalesOrder','Supplier','User'], k:'Entities'},
+    {path:'DTOs/',        col:'#fb923c',      ic:'📦', desc:'API-kontrakt. Arv: Base→Get/Post/Put. Skyddar mot circular reference och data-läckage.', files:['Auth/','Customers/','Products/','Suppliers/','Carts/'], k:'DTOs'},
+    {path:'Repositories/',col:'var(--ora)',   ic:'🏗️', desc:'All databas-logik. LINQ + EF Core. Implementerar Interfaces. Testbar och utbytbar.', files:['ProductRepository.cs','SupplierRepository.cs'], k:'ProdRepo'},
+    {path:'Interfaces/',  col:'var(--pur)',   ic:'📐', desc:'Kontrakt. Controllers beror på dessa — aldrig konkreta klasser.', files:['IProductRepository.cs','ISupplierRepository.cs'], k:'Ifaces'},
+    {path:'Services/',    col:'var(--cya)',   ic:'⚙️', desc:'TokenService: JWT med HMAC-SHA512 och claims.', files:['TokenService.cs'], k:'TokenSvc'},
+    {path:'Data/',        col:'#6ee7b7',      ic:'🗄️', desc:'EShopContext (IdentityDbContext, composite keys). SeedDatabase (Migrate + seed).', files:['eShopContext.cs','SeedDatabase.cs','Json/'], k:'DbCtx'},
+    {path:'Mock/',        col:'var(--red)',   ic:'🃏', desc:'Falska implementationer för testning utan riktig databas.', files:['MockSupplier.cs'], k:'Ifaces'},
+  ];
+  let html = '<div class="ptit">Mappstruktur</div><div class="psub">Klicka för detaljer</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  folders.forEach(f => {
+    html += '<div style="display:flex;gap:10px;padding:12px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:9px;cursor:pointer;border-left:3px solid ' + f.col + ';transition:filter .15s" onmouseover="this.style.filter=\'brightness(1.1)\'" onmouseout="this.style.filter=\'\'" onclick="nav(\'' + f.k + '\')">';
+    html += '<div style="font-size:20px;flex-shrink:0;line-height:1.2">' + f.ic + '</div>';
+    html += '<div><div style="font-family:var(--mono);font-size:12.5px;font-weight:600;color:' + f.col + ';margin-bottom:3px">' + H(f.path) + '</div>';
+    html += '<div style="font-size:12px;color:var(--txd);margin-bottom:5px">' + H(f.desc) + '</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:3px">';
+    f.files.forEach(x => { html += '<span class="pill">' + H(x) + '</span>'; });
+    html += '</div></div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderOverview() {
+  const counts = [
+    {num:6,lbl:'Controllers'},{num:8,lbl:'Entities'},{num:2,lbl:'Repositories'},
+    {num:2,lbl:'Interfaces'},{num:'15+',lbl:'DTOs'},{num:CONCEPTS.length,lbl:'C# Begrepp'},
+    {num:LESSONS.length,lbl:'Lektioner'},{num:PM_FLAT.main.length+PM_FLAT.l13.length,lbl:'Postman requests'}
+  ];
+  let html = '<div class="ptit">eShop — Koddokumentation</div>';
+  html += '<div class="psub">Jensen-Courses/SYSA25M-CSharp-Forts &middot; ASP.NET Core &middot; EF Core &middot; JWT &middot; Repository Pattern</div>';
+  html += '<div class="ogrid">';
+  counts.forEach(c => {
+    html += '<div class="scard"><div class="snum">' + c.num + '</div><div class="slbl">' + c.lbl + '</div></div>';
+  });
+  html += '</div>';
+  html += '<div class="tip">💡 <strong>Sök ett ord:</strong> async &middot; dto &middot; interface &middot; record &middot; linq &middot; jwt &middot; repository &middot; di &middot; navigeringsegenskap &middot; genericrepo</div>';
+
+  // GitHub sync
+  html += '<div style="background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:13px 18px;margin-bottom:16px">';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">';
+  html += '<div style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px"><span style="color:var(--green)">&#10022;</span> GitHub Sync &mdash; Jensen-Courses/SYSA25M-CSharp-Forts</div>';
+  html += '<button onclick="syncGithub()" style="background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:6px 13px;color:var(--tx);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer" id="gh-btn">&#8635; Synka</button>';
+  html += '</div><div id="gh-status" style="font-size:12px;color:var(--txm);margin-top:6px">Klicka Synka efter lektionen för att hämta ny kod.</div></div>';
+
+  // Folder diagram
+  html += '<div class="card"><div class="chd"><div class="ctit">Mappstruktur — vad gör varje mapp?</div></div>';
+  html += '<div class="cbd">' + renderFolders() + '</div></div>';
+
+  // Architecture flow
+  html += '<div class="card"><div class="chd"><div class="ctit">Arkitekturflöde — Request till Response</div></div>';
+  html += '<div class="cbd">';
+  html += mkCode('// GET /api/products/5\n\n// 1. HTTP Request når ProductsController\n[HttpGet("{id}")]\npublic async Task<ActionResult> FindProduct(int id)\n{\n    // 2. Controller delegerar till Interface\n    var product = await repo.FindProduct(id);\n    //\n    // 3. ProductRepository kör EF Core:\n    //    SELECT Id, ProductName, Price FROM Products WHERE Id = 5\n    //    → Mappas till GetProductDto\n    //\n    // 4. Controller returnerar HTTP 200\n    return Ok(new { Success = true, StatusCode = 200, Data = product });\n}');
+  html += '</div></div>';
+  return html;
+}
+
+function renderLessons() {
+  const cols = ['#4d7cfe','#3ecf8e','#f5a623','#9775fa','#22d3ee','#f472b6','#fb923c','#4d7cfe','#3ecf8e','#f5a623','#9775fa','#22d3ee','#f472b6'];
+  let html = '<div class="ptit">&#128218; Lektionsöversikt</div>';
+  html += '<div class="psub">SYSA25M &mdash; Programmering C# forts &middot; Jensen Courses GitHub</div>';
+  html += '<div class="tip">💡 Varje lektion har ett <strong>starter</strong>-projekt (ditt utgångsläge) och ett <strong>solution</strong>-projekt (facit) i repot.</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:9px">';
+  LESSONS.forEach((l, idx) => {
+    const col = cols[idx % cols.length];
+    const detId = 'ld-' + l.num;
+    const arrId = 'la-' + l.num;
+    html += '<div style="background:var(--s1);border:1px solid var(--b1);border-radius:10px;overflow:hidden">';
+    html += '<div style="padding:13px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer" onclick="var d=document.getElementById(\'' + detId + '\');d.style.display=d.style.display===\'block\'?\'none\':\'block\';document.getElementById(\'' + arrId + '\').style.transform=d.style.display===\'block\'?\'rotate(90deg)\':\'\'">';
+    html += '<div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(77,124,254,.1);border:1px solid rgba(77,124,254,.2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:' + col + '">' + l.num + '</div>';
+    html += '<div style="flex:1"><div style="font-size:13.5px;font-weight:600;margin-bottom:3px">' + H(l.title) + '</div>';
+    html += '<div style="font-size:12px;color:var(--txd);margin-bottom:5px">' + H(l.what.slice(0,80)) + (l.what.length>80?'...':'') + '</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    l.topics.forEach(t => { html += '<span class="pill">' + H(t) + '</span>'; });
+    html += '</div></div>';
+    html += '<span id="' + arrId + '" style="color:var(--txm);font-size:11px;transition:transform .2s;flex-shrink:0;margin-top:6px">&#9654;</span>';
+    html += '</div>';
+    html += '<div id="' + detId + '" style="display:none;border-top:1px solid var(--b1);padding:13px 16px">';
+    html += '<div style="font-size:13px;color:var(--txd);margin-bottom:10px">' + H(l.what) + '</div>';
+    html += '<div style="font-size:11.5px;font-weight:600;color:var(--txm);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Nya filer:</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">';
+    l.newFiles.forEach(f => { html += '<span style="font-family:var(--mono);font-size:11px;padding:3px 8px;background:var(--s2);border:1px solid var(--b1);border-radius:6px;color:var(--green)">' + H(f) + '</span>'; });
+    html += '</div>';
+    html += '<a href="https://github.com/Jensen-Courses/SYSA25M-CSharp-Forts/tree/main/' + H(l.folder) + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:6px 12px;color:var(--txd);text-decoration:none;font-size:12px">&#10022; ' + H(l.folder) + ' p&aring; GitHub &rarr;</a>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// ─── POSTMAN ──────────────────────────────────────────────────────────────────
+function downloadPmCollection(key) {
+  const col = PM_FULL[key];
+  if (!col) return;
+  const name = key === 'main' ? 'E-Shop' : 'E-Shop-Lektion13';
+  const blob = new Blob([JSON.stringify(col, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name + '.postman_collection.json';
+  a.click();
+}
+
+function buildRequestCards(flatList, baseUrl) {
+  const vColor = {GET:'#3ecf8e',POST:'#4d7cfe',PUT:'#f5a623',DELETE:'#f03e3e',PATCH:'#22d3ee'};
+  const vBg    = {GET:'rgba(62,207,142,.12)',POST:'rgba(77,124,254,.12)',PUT:'rgba(245,166,35,.12)',DELETE:'rgba(240,62,62,.12)',PATCH:'rgba(34,211,238,.12)'};
+  const folders = {};
+  flatList.forEach(r => {
+    if (!folders[r.folder]) folders[r.folder] = [];
+    folders[r.folder].push(r);
+  });
+  let html = '';
+  Object.entries(folders).forEach(([fname, reqs]) => {
+    html += '<div style="margin-bottom:18px">';
+    html += '<div style="font-size:13px;font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--b1)">' + H(fname) + ' <span style="font-family:var(--mono);font-size:10px;color:var(--txm)">' + reqs.length + ' requests</span></div>';
+    html += '<div style="display:flex;flex-direction:column;gap:7px">';
+    reqs.forEach((req, i) => {
+      const displayUrl = req.url.replace('{{url}}', baseUrl + '/api');
+      const col = vColor[req.method] || '#94a3b8';
+      const bg  = vBg[req.method]   || 'rgba(100,116,139,.1)';
+      const safeKey = (fname + '_' + i).replace(/[^a-zA-Z0-9_]/g,'_');
+      html += '<div style="background:var(--s1);border:1px solid var(--b1);border-radius:9px;overflow:hidden">';
+      html += '<div style="padding:10px 14px;display:flex;align-items:flex-start;gap:10px">';
+      html += '<span style="background:' + bg + ';color:' + col + ';font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;width:52px;text-align:center;flex-shrink:0;margin-top:1px">' + H(req.method) + '</span>';
+      html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;margin-bottom:2px">' + H(req.name) + '</div>';
+      html += '<div style="font-family:var(--mono);font-size:11px;color:var(--txm);word-break:break-all">' + H(displayUrl) + '</div>';
+      if (req.hasTests) html += '<div style="font-size:11px;color:var(--green);margin-top:2px">&#10003; Postman-tester inkluderade</div>';
+      html += '</div>';
+      html += '<button data-key="' + safeKey + '" onclick="cpPmReq(this,PM_FLAT[currentPmTab])" style="background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:5px 10px;color:var(--txd);font-family:var(--sans);font-size:11px;cursor:pointer;flex-shrink:0">Kopiera</button>';
+      html += '</div>';
+      if (req.body) {
+        html += '<div style="border-top:1px solid var(--b1);padding:9px 14px;background:#080a0f">';
+        html += '<pre style="font-family:var(--mono);font-size:11.5px;color:#c9d1e0;margin:0;overflow-x:auto;line-height:1.6">' + H(req.body) + '</pre>';
+        html += '</div>';
+      }
+      if (req.hasTests && req.testCode) {
+        html += '<div style="border-top:1px solid var(--b1);padding:9px 14px">';
+        html += '<div style="font-size:10px;color:var(--green);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Postman Tests</div>';
+        html += '<pre style="font-family:var(--mono);font-size:11px;color:#86efac;margin:0;overflow-x:auto;line-height:1.6;opacity:.8">' + H(req.testCode) + '</pre>';
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  return html;
+}
+
+// Build key map for copy buttons
+const PM_KEY_MAP = {};
+['main','l13'].forEach(key => {
+  const folders = {};
+  (PM_FLAT[key]||[]).forEach(r => {
+    if (!folders[r.folder]) folders[r.folder] = [];
+    const safeKey = (r.folder + '_' + folders[r.folder].length).replace(/[^a-zA-Z0-9_]/g,'_');
+    PM_KEY_MAP[safeKey] = r;
+    folders[r.folder].push(r);
+  });
+});
+
+let currentPmTab = 'main';
+
+function cpPmReq(btn, flatList) {
+  const key = btn.getAttribute('data-key');
+  const req = PM_KEY_MAP[key];
+  if (!req) return;
+  const baseUrl = (document.getElementById('pm-baseurl')||{}).value || 'http://localhost:5001';
+  const url = req.url.replace('{{url}}', baseUrl + '/api');
+  let text = req.method + ' ' + url + '\nContent-Type: application/json\n';
+  if (req.body) text += '\n' + req.body;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '\u2713 OK';
+    setTimeout(() => btn.textContent = 'Kopiera', 1800);
+    const t = document.createElement('div');
+    t.textContent = '\u2713 ' + req.name;
+    t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1e2330;border:1px solid #3ecf8e;border-radius:8px;padding:10px 16px;color:#3ecf8e;font-size:13px;z-index:9999;animation:fi .2s ease';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2000);
+  });
+}
+
+function switchPmTab(key) {
+  currentPmTab = key;
+  const baseUrl = (document.getElementById('pm-baseurl')||{}).value || 'http://localhost:5001';
+  const content = document.getElementById('pm-content');
+  if (content) content.innerHTML = buildRequestCards(PM_FLAT[key]||[], baseUrl);
+  ['main','l13'].forEach(k => {
+    const btn = document.getElementById('pm-btn-' + k);
+    if (!btn) return;
+    if (k === key) { btn.style.background='var(--blue)'; btn.style.color='#fff'; }
+    else { btn.style.background='var(--s2)'; btn.style.color='var(--txd)'; }
+  });
+}
+
+function renderPostman() {
+  const baseUrl = 'http://localhost:5001';
+  currentPmTab = 'main';
+  let html = '<div class="ptit">&#128236; Postman Collection</div>';
+  html += '<div class="psub">Michael Gustavssons Postman-filer fr&aring;n repot &middot; Jensen-Courses/SYSA25M-CSharp-Forts</div>';
+  // Config bar
+  html += '<div style="background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:14px 18px;margin-bottom:16px">';
+  html += '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">';
+  html += '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px">';
+  html += '<span style="font-size:12px;color:var(--txd);white-space:nowrap">Base URL:</span>';
+  html += '<input id="pm-baseurl" type="text" value="' + baseUrl + '" style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:6px 10px;font-family:var(--mono);font-size:12px;color:var(--tx);outline:none"/>';
+  html += '</div>';
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html += '<button onclick="downloadPmCollection(\'main\')" style="background:var(--blue);border:none;border-radius:7px;padding:8px 14px;color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">&#11015; E-Shop collection</button>';
+  html += '<button onclick="downloadPmCollection(\'l13\')" style="background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:8px 14px;color:var(--tx);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">&#11015; Lektion 13</button>';
+  html += '</div></div>';
+  html += '<div style="background:rgba(77,124,254,.06);border:1px solid rgba(77,124,254,.15);border-radius:7px;padding:10px 13px;font-size:12px;color:var(--txd);line-height:1.6">';
+  html += '<strong style="color:var(--blue)">Importera i Postman:</strong> Klicka &#11015; &rarr; filen laddas ned &rarr; Postman &rarr; Import &rarr; dra in .json &rarr; klart!<br>';
+  html += '<span style="color:var(--txm)">S&auml;tt variabeln <code style="font-family:var(--mono);background:var(--s3);padding:1px 4px;border-radius:3px">{{url}}</code> = http://localhost:5001/api under Collections &rarr; Variables</span>';
+  html += '</div></div>';
+  // Tab buttons
+  html += '<div style="display:flex;gap:8px;margin-bottom:16px">';
+  html += '<button id="pm-btn-main" onclick="switchPmTab(\'main\')" style="background:var(--blue);border:1px solid var(--b1);border-radius:7px;padding:7px 14px;color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">E-Shop (main)</button>';
+  html += '<button id="pm-btn-l13" onclick="switchPmTab(\'l13\')" style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:7px 14px;color:var(--txd);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">Lektion 13</button>';
+  html += '</div>';
+  html += '<div id="pm-content">' + buildRequestCards(PM_FLAT.main, baseUrl) + '</div>';
+  return html;
+}
+
+// ─── YOUTUBE ──────────────────────────────────────────────────────────────────
+const YT_TOPICS = {
+  async:'async / await', interface:'interface', repository:'Repository Pattern',
+  jwt:'JWT / Token', di:'Dependency Injection', efcore:'Entity Framework Core',
+  linq:'LINQ', record:'record', identity:'ASP.NET Identity', dto:'DTO', genericrepo:'Generic Repository'
+};
+
+function getVids(topic) {
+  try { return JSON.parse(localStorage.getItem('yt_' + topic) || '[]'); } catch { return []; }
+}
+function saveVid(topic, id, title) {
+  const vids = getVids(topic);
+  if (!vids.find(v => v.id === id)) vids.push({id, title});
+  localStorage.setItem('yt_' + topic, JSON.stringify(vids));
+}
+function rmVid(topic, id) {
+  const vids = getVids(topic).filter(v => v.id !== id);
+  localStorage.setItem('yt_' + topic, JSON.stringify(vids));
+}
+
+function renderYtSection(topic) {
+  const vids = getVids(topic);
+  const label = YT_TOPICS[topic] || topic;
+  let html = '<div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px;margin-top:14px" id="yts-' + topic + '">';
+  html += '<div style="font-size:13px;font-weight:600;margin-bottom:9px;display:flex;align-items:center;gap:7px"><span style="color:#ff4444">&#9654;</span> Videos &mdash; ' + H(label) + '</div>';
+  if (!vids.length) html += '<div style="font-size:12px;color:var(--txm);margin-bottom:8px">Inga videos tillagda &auml;nnu.</div>';
+  vids.forEach(v => {
+    html += '<a href="https://www.youtube.com/watch?v=' + H(v.id) + '" target="_blank" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--bg);border:1px solid var(--b1);border-radius:7px;text-decoration:none;color:var(--tx);margin-bottom:6px">';
+    html += '<div style="width:40px;height:28px;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.3);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#ff4444">&#9654;</div>';
+    html += '<div style="flex:1"><div style="font-size:12.5px;font-weight:600">' + H(v.title||v.id) + '</div><div style="font-size:11px;color:var(--txd)">youtube.com/watch?v=' + H(v.id) + '</div></div>';
+    html += '<button onclick="event.preventDefault();event.stopPropagation();rmVid(\'' + topic + '\',\'' + v.id + '\');document.getElementById(\'yts-' + topic + '\').outerHTML=renderYtSection(\'' + topic + '\')" style="background:none;border:none;color:var(--txm);cursor:pointer;font-size:16px;padding:0 4px">&#215;</button>';
+    html += '</a>';
+  });
+  html += '<button onclick="document.getElementById(\'ytf-' + topic + '\').classList.toggle(\'open\')" style="background:rgba(255,68,68,.08);border:1px dashed rgba(255,68,68,.3);border-radius:7px;padding:8px 12px;cursor:pointer;font-size:12px;color:var(--txd);width:100%;text-align:left">&#43; L&auml;gg till video</button>';
+  html += '<div id="ytf-' + topic + '" style="display:none;margin-top:8px;background:var(--s3);border-radius:8px;padding:12px">';
+  html += '<div style="font-size:11.5px;color:var(--txd);margin-bottom:4px">Video-ID (fr&aring;n URL:en efter ?v=) eller hela URL:en:</div>';
+  html += '<input id="ytid-' + topic + '" type="text" placeholder="t.ex. dQw4w9WgXcQ" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:7px 10px;font-family:var(--mono);font-size:12px;color:var(--tx);outline:none;margin-bottom:8px"/>';
+  html += '<input id="yttt-' + topic + '" type="text" placeholder="Titel (valfri)" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:7px 10px;font-family:var(--sans);font-size:12px;color:var(--tx);outline:none;margin-bottom:8px"/>';
+  html += '<button onclick="addVid(\'' + topic + '\')" style="background:var(--blue);border:none;border-radius:6px;padding:7px 14px;color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">Spara</button>';
+  html += '</div>';
+  html += '<div style="font-size:10.5px;color:var(--txm);margin-top:8px">Kanal: <a href="https://www.youtube.com/@michaelgustavsson8645/playlists" target="_blank" style="color:var(--blue)">Michael Gustavsson &rarr;</a></div>';
+  html += '</div>';
+  return html;
+}
+
+function addVid(topic) {
+  const rawId = (document.getElementById('ytid-' + topic)||{}).value?.trim() || '';
+  const title = (document.getElementById('yttt-' + topic)||{}).value?.trim() || rawId;
+  if (!rawId) return;
+  const match = rawId.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  const vid = match ? match[1] : rawId;
+  saveVid(topic, vid, title);
+  const el = document.getElementById('yts-' + topic);
+  if (el) el.outerHTML = renderYtSection(topic);
+}
+
+function renderVideos() {
+  let html = '<div class="ptit">&#9654; YouTube Videos</div>';
+  html += '<div class="psub">Spellista: SYS&Auml;25M-Programmering C# forts &middot; <a href="https://www.youtube.com/@michaelgustavsson8645/playlists" target="_blank" style="color:var(--blue)">Michael Gustavsson &rarr;</a></div>';
+  html += '<div class="tip">&#43; L&auml;gg till ett video-ID under respektive &auml;mne. Visas automatiskt vid s&ouml;kning och i AI-chatten.</div>';
+  Object.entries(YT_TOPICS).forEach(([key, label]) => {
+    html += '<div class="card"><div class="chd"><div class="ctit">' + H(label) + '</div></div>';
+    html += '<div class="cbd">' + renderYtSection(key) + '</div></div>';
+  });
+  return html;
+}
+
+// ─── GITHUB SYNC ──────────────────────────────────────────────────────────────
+const GITHUB_REPO = 'Jensen-Courses/SYSA25M-CSharp-Forts';
+let lastSha = null;
+
+async function syncGithub() {
+  const btn = document.getElementById('gh-btn');
+  const status = document.getElementById('gh-status');
+  if (!btn || !status) return;
+  btn.disabled = true;
+  btn.textContent = '&#8635; Hämtar...';
+  status.innerHTML = '<span style="color:var(--blue)">Hämtar från GitHub...</span>';
+  try {
+    const res = await fetch('https://api.github.com/repos/' + GITHUB_REPO + '/branches/main');
+    const data = await res.json();
+    const sha = data.commit?.sha;
+    if (!sha) throw new Error('Kunde inte hämta branch-info');
+    if (sha === lastSha) {
+      status.innerHTML = '<span style="color:var(--green)">&#10003; Redan uppdaterad (commit: ' + sha.slice(0,7) + ')</span>';
+    } else {
+      lastSha = sha;
+      const msg = data.commit?.commit?.message || '';
+      status.innerHTML = '<span style="color:var(--green)">&#10003; Synkad! Commit: ' + sha.slice(0,7) + (msg ? ' &mdash; "' + H(msg.slice(0,60)) + '"' : '') + '</span>';
+    }
+  } catch(e) {
+    status.innerHTML = '<span style="color:var(--red)">Fel: ' + H(e.message) + '</span>';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '&#8635; Synka';
+}
+
+// ─── AI ───────────────────────────────────────────────────────────────────────
+function toggleAI() { aiOpen = !aiOpen; document.getElementById('AIP').classList.toggle('open', aiOpen); }
+function aiKey(e) { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAI(); } }
+
+async function sendAI() {
+  const inp = document.getElementById('AIINP');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  const msgs = document.getElementById('AIMSGS');
+  const btn = document.getElementById('SNDBTN');
+  msgs.innerHTML += '<div class="msg user">' + H(msg) + '</div>';
+  inp.value = '';
+  btn.disabled = true;
+  const lid = 'ld' + Date.now();
+  msgs.innerHTML += '<div class="msg ld" id="' + lid + '">T&auml;nker<span class="typing"></span></div>';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const sys = 'Du är en erfaren lärare i C# och ASP.NET Core. Svara ALLTID på svenska. Var pedagogisk.\n\nPROJEKTET: eShop — ASP.NET Core, EF Core, SQLite/MySQL/PostgreSQL, JWT, ASP.NET Identity\nKURSEN: SYSA25M (Jensen Courses) — 13 lektioner, GitHub: Jensen-Courses/SYSA25M-CSharp-Forts\nLektion 13 nytt: Generic Repository (IGenericRepository<T> where T : BaseEntity) och AutoMapper (MappingProfiles)\nArchitecture: Controllers → Interfaces → Repositories → EShopContext → DB\nC# 12: Primary Constructors, Collection expressions, null-coalescing throw\n\nSvara med: 1) Förklaring på svenska, 2) Kodsnutt från projektet i ```csharp, 3) Vilken fil det gäller';
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:1000, system:sys, messages:[{role:'user',content:msg}]})
+    });
+    const d = await r.json();
+    document.getElementById(lid)?.remove();
+    let txt = (d.content||[]).map(b => b.text||'').join('') || 'Kunde inte hämta svar.';
+    txt = H(txt)
+      .replace(/```[\w]*\n?([\s\S]*?)```/g, (_, c) => '<pre>' + H(c.trim()) + '</pre>')
+      .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+      .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+    msgs.innerHTML += '<div class="msg bot">' + txt + '</div>';
+  } catch(e) {
+    document.getElementById(lid)?.remove();
+    msgs.innerHTML += '<div class="msg bot" style="color:var(--red)">Fel: ' + H(e.message) + '</div>';
+  }
+  btn.disabled = false;
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+showPage('overview');
+
+</script>
+</body>
+</html>
